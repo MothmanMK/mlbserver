@@ -2781,6 +2781,33 @@ app.get('/', async function(req, res) {
 
     // Highlights modal functions
     body += `<script type="text/javascript">
+    `
+    // Highlights modal positioning
+    body += `var pageScrollY = 0;
+
+    function openModal() {
+      pageScrollY = window.scrollY || document.documentElement.scrollTop;
+      document.body.style.position = "fixed";
+      document.body.style.top = "-" + pageScrollY + "px";
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, pageScrollY);
+      modal.style.display = "none";
+    }
+      `
+  body += `
 var modal = document.getElementById("myModal");
 var highlightsModal = document.getElementById("highlights");
 var span = document.getElementsByClassName("close")[0];
@@ -2812,7 +2839,7 @@ function parsehighlightsresponse(responsetext) {
     }
     modaltext += "</ul>";
     highlightsModal.innerHTML = modaltext;
-    modal.style.display = "block"
+    openModal();
   } catch (e) {
     alert("Error processing highlights: " + e.message)
   }
@@ -2821,12 +2848,9 @@ function showhighlights(gamePk, gameDate) {
   makeGETRequest("` + http_root + `/highlights?gamePk=" + gamePk + "&gameDate=" + gameDate + "` + content_protect_b + `", parsehighlightsresponse);
   return false
 }
-span.onclick = function() {
-  modal.style.display = "none";
-}
-`
+span.onclick = closeModal;`
 
-    body += 'window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }</script>' + "\n"
+    body += 'window.onclick = function(event) { if (event.target == modal) {closeModal()} }</script>' + "\n"
 
     body += "</body></html>"
 
