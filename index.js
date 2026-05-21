@@ -2306,23 +2306,38 @@ app.get('/', async function(req, res) {
           }
         }
 
-        body += '<tr'
+        function hexToRgba(hex, alpha) {
+          const r = parseInt(hex.substring(0, 2), 16)
+          const g = parseInt(hex.substring(2, 4), 16)
+          const b = parseInt(hex.substring(4, 6), 16)
+          return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')'
+        }
+
         let fav_style = ''
-        if ( argv.free && cache_data.dates[0].games[j].broadcasts && cache_data.dates[0].games[j].broadcasts[0] && cache_data.dates[0].games[j].broadcasts[0].freeGame ) {
-          body += ' class="freegame"'
+        let freeGameVis = 'is-invisible'
+        let favoritVis = 'is-invisible' 
+        
+       if ( argv.free && cache_data.dates[0].games[j].broadcasts && cache_data.dates[0].games[j].broadcasts[0] && cache_data.dates[0].games[j].broadcasts[0].freeGame ) {
+          freeGameVis = ''
+ 
         } else if ( session.credentials.fav_teams.includes(cache_data.dates[0].games[j].teams['away'].team.abbreviation) || session.credentials.fav_teams.includes(cache_data.dates[0].games[j].teams['home'].team.abbreviation) ) {
           let fav_team = cache_data.dates[0].games[j].teams['away'].team.abbreviation
           if ( session.credentials.fav_teams.includes(cache_data.dates[0].games[j].teams['home'].team.abbreviation) ) {
             fav_team = cache_data.dates[0].games[j].teams['home'].team.abbreviation
           }
-          fav_style = ' style="color:#' + TEAM_COLORS[fav_team][0] + ';background:#' + TEAM_COLORS[fav_team][1] + ';"'
-          body += fav_style
+
+          favoritVis = ''
+          let color1 = hexToRgba(TEAM_COLORS[fav_team][1], 0.2)
+          let color2 = hexToRgba(TEAM_COLORS[fav_team][0], 0)
+          
+          fav_style = ' style="background-image: linear-gradient(' + '0deg, ' + color1 + ', ' + color2 + '); border: 1px solid #' + TEAM_COLORS[fav_team][1] + '; border-style: outset; border-radius: 7px;"'
         }
-        let description = ''
+
+        let gameLevel = session.getLevelNameFromSportId(cache_data.dates[0].games[j].teams['home'].team.sport.id);
+
         if ( cache_data.dates[0].games[j].seriesDescription != 'Regular Season' ) {
-          description += cache_data.dates[0].games[j].seriesDescription + ': '
+          gameLevel = cache_data.dates[0].games[j].seriesDescription
         }
-        body += '><td>' + description + teams + pitchers + state + '</td>'
 
         // Check if Winter League / MiLB game first
         if ( (cache_data.dates[0].games[j].teams['away'].team.sport.id != levels['MLB']) && (cache_data.dates[0].games[j].teams['home'].team.sport.id != levels['MLB']) && (mediaType == 'MLBTV') ) {
