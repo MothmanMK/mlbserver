@@ -1862,6 +1862,13 @@ app.get('/', async function(req, res) {
     let currentDate = new Date()
 
     let entitlements = await session.getEntitlements()
+    body += `<script>
+        function toast() {
+        var x = document.getElementById("snackbar");
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+      } 
+  </script>`
 
     // MASN live stream for entitled subscribers
     try {
@@ -3029,6 +3036,53 @@ function showhighlights(gamePk, gameDate) {
 span.onclick = closeModal;`
 
     body += 'window.onclick = function(event) { if (event.target == modal) {closeModal()} }</script>' + "\n"
+
+    // Condensed game code
+    body += `<script type="text/javascript">
+
+    function parseCondensed(responsetext) {
+      try {
+        var highlights = JSON.parse(responsetext);
+        var captions_parameter = '';
+        if (captions == 'disabled') {
+          captions_parameter = '&captions=disabled';
+        }
+        if (highlights && (highlights.length > 0)) {
+
+          for (var i = 0; i < highlights.length; i++) {
+
+            if (highlights[i].headline && highlights[i].headline.indexOf("Condensed Game") !== -1) {
+              var hls_url = '';
+              var mp4_url = '';
+              for (var j = 0; j < highlights[i].playbacks.length; j++) {
+                if (highlights[i].playbacks[j].name && (highlights[i].playbacks[j].name == 'HTTP_CLOUD_WIRED_60')) {
+                  hls_url = highlights[i].playbacks[j].url;
+                } else if (highlights[i].playbacks[j].name && (highlights[i].playbacks[j].name == 'mp4Avc')) {
+                  mp4_url = highlights[i].playbacks[j].url;
+                }
+              }
+              break;
+            }
+          }
+            
+            if (highlights[i] =! '') { window.location.href = "` + link + `?highlight_src=" + encodeURIComponent(hls_url) + "&resolution=" + resolution + captions_parameter + "` + content_protect_b + `"; }
+
+
+        }
+      } catch (e) {
+       
+        {toast()}
+      }
+    }
+
+    function showcondensed(gamePk, gameDate) {
+      makeGETRequest("` + http_root + `/highlights?gamePk=" + gamePk + "&gameDate=" + gameDate + "` + content_protect_b + `", parseCondensed);
+      return false
+    }
+
+        </script>`
+
+    body += '<div id="snackbar">Not yet available. Come back later.</div>'
 
     body += "</body></html>"
 
