@@ -1735,7 +1735,10 @@ app.get('/', async function(req, res) {
       body += '<p><a href="' + http_root + '/logout">Logout</a></p>' + "\n"
     }
 
-    body += '<p><span class="tooltip tinytext">Touch or hover over an option name for more details</span></p>' + "\n"
+    body += '<div class="cardContainer">'
+    body += '<div class="cardMenuHeader">Controls</div>'
+    body += '<div class="cardContent cardEnd">'
+    body += '<span class="tinytext">Touch or hover over an option name for more details</span>' + "\n"
 
     todayUTCHours -= 4
     body += '<p><span class="tooltip">Date<span class="tooltiptext">"today" lasts until ' + todayUTCHours + ' AM EST. Home page will default to yesterday between ' + todayUTCHours + ' AM - ' + (YESTERDAY_UTC_HOURS - 4) + ' AM EST.</span></span>: <input type="date" id="gameDate" value="' + gameDate + '"/> '
@@ -1744,16 +1747,17 @@ app.get('/', async function(req, res) {
       if ( ((VALID_DATES[i] == VALID_DATES[0]) && (gameDate == today)) || ((VALID_DATES[i] == VALID_DATES[1]) && (gameDate == yesterday)) ) body += 'class="default" '
       body += 'onclick="date=\'' + VALID_DATES[i] + '\';reload()">' + VALID_DATES[i] + '</button> '
     }
-    body += '</p>' + "\n" + '<p><span class="tinytext">Updated ' + session.getCacheUpdatedDate(cache_name) + '</span></p>' + "\n"
+    body += '</p>' + "\n" + '<p><span>Updated ' + session.getCacheUpdatedDate(cache_name) + '</span></p>' + "\n"
 
-    body += '<p><span class="tooltip">Level<span class="tooltiptext">Major or minor league level</span></span>: '
+    body += '<div class="option"><span class="tooltip">Level<span class="tooltiptext">Major or minor league level</span></span>: '
     for (const [key, value] of Object.entries(levels)) {
       body += '<button '
       if ( level == key ) body += 'class="default" '
       body += 'onclick="org=\'' + default_org + '\';level=\'' + key + '\';reload()">' + key + '</button> '
     }
 
-    body += ' or <span class="tooltip">Org<span class="tooltiptext">Major league parent organization</span></span>: '
+    body += ' or</div>'
+    body += '<div class="option"><span class="tooltip">Org<span class="tooltiptext">Major league parent organization</span></span>: '
     body += '<select id="org" onchange="level=\'' + default_org + '\';org=this.value;reload()">'
     body += '<option value="' + default_org + '">' + default_org + '</option>'
     var orgs = session.getOrgs()
@@ -1762,7 +1766,7 @@ app.get('/', async function(req, res) {
       if ( org == orgs[i] ) body += ' selected'
       body += '>' + orgs[i] + '</option> '
     }
-    body += '</select></p>' + "\n"
+    body += '</select></div>' + "\n"
 
     body += '<p><span class="tooltip">Media Type<span class="tooltiptext">Video is TV broadcasts, Audio is English radio, and Spanish is Spanish radio (not available for all games).</span></span>: '
     for (var i = 0; i < VALID_MEDIA_TYPES.length; i++) {
@@ -1790,7 +1794,7 @@ app.get('/', async function(req, res) {
       }
       body += '</p>' + "\n"
 
-      body += '<p><span class="tooltip">Start From<span class="tooltiptext">For the embedded player only: Beginning will start playback at the beginning of the stream (may be 1 hour before game time for live games), and Live will start at the live point (if the event is live -- archive games should always start at the beginning). You can still seek anywhere.</span></span>: '
+      body += '<div class="option"><span class="tooltip">Start From<span class="tooltiptext">For the embedded player only: Beginning will start playback at the beginning of the stream (may be 1 hour before game time for live games), and Live will start at the live point (if the event is live -- archive games should always start at the beginning). You can still seek anywhere.</span></span>: '
       for (var i = 0; i < VALID_START_FROM.length; i++) {
         body += '<button '
         if ( startFrom == VALID_START_FROM[i] ) body += 'class="default" '
@@ -1798,12 +1802,12 @@ app.get('/', async function(req, res) {
       }
       body += "\n"
       if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-        body += 'or '
+        body += 'or</div> '
       }
     }
 
     if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-      body += '<span class="tooltip">Inning<span class="tooltiptext">For video streams only: choose the inning to start with (and the score to display, if applicable). Inning number is relative -- for example, selecting inning 7 here will show inning 7 for scheduled 9-inning games, but inning 5 for scheduled 7-inning games, for example. If an inning number is specified, seeking to an earlier point will not be possible. Default is the beginning of the stream. To use with radio, set the video track to "None".</span></span>: '
+      body += '<div class="option"><span class="tooltip">Inning<span class="tooltiptext">For video streams only: choose the inning to start with (and the score to display, if applicable). Inning number is relative -- for example, selecting inning 7 here will show inning 7 for scheduled 9-inning games, but inning 5 for scheduled 7-inning games, for example. If an inning number is specified, seeking to an earlier point will not be possible. Default is the beginning of the stream. To use with radio, set the video track to "None".</span></span>: '
       body += '<select id="inning_half" onchange="inning_half=this.value;reload()">'
       for (var i = 0; i < VALID_INNING_HALF.length; i++) {
         body += '<option value="' + VALID_INNING_HALF[i] + '"'
@@ -1821,7 +1825,7 @@ app.get('/', async function(req, res) {
       }
       body += '</select>'
     }
-    body += '</p>' + "\n"
+    body += '</div>' + "\n"
 
     body += '<p><span class="tooltip">Scores<span class="tooltiptext">Choose whether to show scores on this web page. Combine this with the inning option to only show scores through the specified inning.</span></span>: '
     for (var i = 0; i < VALID_SCORES.length; i++) {
@@ -1831,7 +1835,7 @@ app.get('/', async function(req, res) {
     }
     body += '</p>' + "\n"
 
-    body += "<table>" + "\n"
+    body += '</div></div>' 
 
     // Rename some parameters before display links
     var mediaFeedType = 'mediaFeedType'
@@ -1862,6 +1866,29 @@ app.get('/', async function(req, res) {
     let currentDate = new Date()
 
     let entitlements = await session.getEntitlements()
+
+    body += `<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var coll = document.getElementsByClassName("cardInfoLine");
+      var i;
+      for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+          this.classList.toggle("active");
+          var content = this.nextElementSibling;
+          if (!content) {
+            return;
+          }
+          if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+          } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+          }
+        });
+      }
+    });
+  </script>`
+
+
     body += `<script>
         function toast() {
         var x = document.getElementById("snackbar");
@@ -1870,10 +1897,15 @@ app.get('/', async function(req, res) {
       } 
   </script>`
 
+    body += `<div class="cardContainer">
+              <div class="cardMenuHeader">Subscription streams</div>
+                <div class="cardContent">`
+
+
     // MASN live stream for entitled subscribers
     try {
         if ( entitlements.includes('MASN_110') ) {
-          body += '<tr><td><span class="tooltip">MASN<span class="tooltiptext">MASN live stream for entitled subscribers. <a href="https://support.mlb.com/s/article/MASN-In-Market-Offering">See here for more information</a>.</span></span></td><td>'
+          body += '<div class="flex-between subscriptionStream"><span>MASN</span>'
           let querystring = '?event=MASN'
           let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
           if ( linkType == VALID_LINK_TYPES[0] ) {
@@ -1888,9 +1920,9 @@ app.get('/', async function(req, res) {
           }
           querystring += content_protect_b
           multiviewquerystring += content_protect_b
-          body += '<a href="' + thislink + querystring + '">MASN</a>'
-          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)">'
-          body += '</td></tr>' + "\n"
+          body += '<span><a href="' + thislink + querystring + '">MASN</a>'
+          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)"></span>'
+          body += '</div>' + "\n"
         } // end entitlements check
     } catch (e) {
       session.debuglog('MASN detect error : ' + e.message)
@@ -1899,7 +1931,7 @@ app.get('/', async function(req, res) {
     // MLB Network live stream for eligible USA subscribers
     try {
         if ( entitlements.includes('MLBN') || entitlements.includes('EXECMLB') || entitlements.includes('MLBTVMLBNADOBEPASS') ) {
-          body += '<tr><td><span class="tooltip">MLB Network<span class="tooltiptext">MLB Network live stream is now available in the USA for paid MLBTV subscribers or as a paid add-on, in addition to authenticated TV subscribers. <a href="https://support.mlb.com/s/article/MLB-Network-Streaming-FAQ">See here for more information</a>.</span></span></td><td>'
+          body += '<div class="flex-between subscriptionStream"><span>MLB Network</span>'
           let querystring = '?event=MLBN'
           let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
           if ( linkType == VALID_LINK_TYPES[0] ) {
@@ -1914,9 +1946,9 @@ app.get('/', async function(req, res) {
           }
           querystring += content_protect_b
           multiviewquerystring += content_protect_b
-          body += '<a href="' + thislink + querystring + '">MLB Network</a>'
-          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)">'
-          body += '</td></tr>' + "\n"
+          body += '<span><a href="' + thislink + querystring + '">MLB Network</a>'
+          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)"></span>'
+          body += '</div>' + "\n"
         } // end entitlements check
     } catch (e) {
       session.debuglog('MLB Network detect error : ' + e.message)
@@ -1925,7 +1957,7 @@ app.get('/', async function(req, res) {
     // SNLA live stream for entitled subscribers
     try {
         if ( entitlements.includes('SNLA_119') ) {
-          body += '<tr><td><span class="tooltip">SportsNet LA<span class="tooltiptext">SNLA live stream for entitled subscribers. <a href="https://support.mlb.com/s/article/SNLA-Plus-Subscription-Packages">See here for more information</a>.</span></span></td><td>'
+          body += '<div class="flex-between subscriptionStream"><span>SportsNet LA</span>'
           let querystring = '?event=SNLA'
           let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
           if ( linkType == VALID_LINK_TYPES[0] ) {
@@ -1940,9 +1972,9 @@ app.get('/', async function(req, res) {
           }
           querystring += content_protect_b
           multiviewquerystring += content_protect_b
-          body += '<a href="' + thislink + querystring + '">SNLA</a>'
-          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)">'
-          body += '</td></tr>' + "\n"
+          body += '<span><a href="' + thislink + querystring + '">SNLA</a>'
+          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)"></span>'
+          body += '</div>' + "\n"
         } // end entitlements check
     } catch (e) {
       session.debuglog('SNLA detect error : ' + e.message)
@@ -1951,7 +1983,7 @@ app.get('/', async function(req, res) {
     // SNY live stream for entitled subscribers
     try {
         if ( entitlements.includes('SNY_121') ) {
-          body += '<tr><td><span class="tooltip">SNY<span class="tooltiptext">SNY live stream for entitled subscribers. <a href="https://support.mlb.com/s/article/SNY-In-Market-Offering">See here for more information</a>.</span></span></td><td>'
+          body += '<div class="flex-between subscriptionStream"><span>SNY</span>'
           let querystring = '?event=SNY'
           let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
           if ( linkType == VALID_LINK_TYPES[0] ) {
@@ -1966,9 +1998,9 @@ app.get('/', async function(req, res) {
           }
           querystring += content_protect_b
           multiviewquerystring += content_protect_b
-          body += '<a href="' + thislink + querystring + '">SNY</a>'
-          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)">'
-          body += '</td></tr>' + "\n"
+          body += '<span><a href="' + thislink + querystring + '">SNY</a>'
+          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)"></span>'
+          body += '</div>' + "\n"
         } // end entitlements check
     } catch (e) {
       session.debuglog('SNY detect error : ' + e.message)
@@ -2003,9 +2035,10 @@ app.get('/', async function(req, res) {
         big_inning = await session.getBigInningSchedule(gameDate)
       }
       if ( big_inning ) {
+        body += '<div class="flex-between subscriptionStream">' + "\n"
         for (var i = 0; i < big_inning.length; i++) {
           if ( big_inning[i].start ) {
-            body += '<tr><td><span class="tooltip">' + new Date(big_inning[i].start).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + new Date(big_inning[i].end).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '<span class="tooltiptext">Big Inning is the live look-in and highlights show. <a href="https://support.mlb.com/s/article/What-Is-MLB-Big-Inning">See here for more information</a>.</span></span></td><td>'
+            body += '<span>' + new Date(big_inning[i].start).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + new Date(big_inning[i].end).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
             let compareStart = new Date(big_inning[i].start)
             compareStart.setMinutes(compareStart.getMinutes()-10)
             let compareEnd = new Date(big_inning[i].end)
@@ -2025,16 +2058,16 @@ app.get('/', async function(req, res) {
               }
               querystring += content_protect_b
               multiviewquerystring += content_protect_b
-              body += '<a href="' + thislink + querystring + '">Big Inning</a>'
-              body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)">'
+              body += '<span><a href="' + thislink + querystring + '">Big Inning</a>'
+              body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)"></span>'
             } else {
-              body += 'Big Inning'
+              body += '<span>Big Inning</span>'
             }
-            body += '</td></tr>' + "\n"
+            body += '</div>' + "\n"
           }
         }
       }
-
+      
       // Game Changer and Stream Finder
       if ( (gameDate >= today) && cache_data.dates && cache_data.dates[0] && cache_data.dates[0].games && (cache_data.dates[0].games.length > 1) ) {
         let gameIndexes = await session.get_first_and_last_games(cache_data.dates[0].games, blackouts)
@@ -2046,7 +2079,8 @@ app.get('/', async function(req, res) {
             compareEnd.setHours(compareEnd.getHours()+4)
           }
           compareEnd.setHours(compareEnd.getHours()+4)
-          body += '<tr><td><span class="tooltip">' + compareStart.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + compareEnd.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '<span class="tooltiptext">The game changer stream will automatically switch between the highest leverage active live non-blackout games, and should be available whenever there are such games available. Does not support adaptive bitrate switching, will default to 720p60 resolution if not specified.</span></span></td><td>'
+          body += '<div class="flex-between subscriptionStream">' + "\n"
+          body += '<span>' + compareStart.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + compareEnd.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
           if ( (currentDate >= compareStart) && (currentDate < compareEnd) ) {
             let streamURL = server + '/gamechanger.m3u8'
             let multiviewquerystring = '/gamechanger.m3u8?resolution=' + DEFAULT_MULTIVIEW_RESOLUTION + content_protect_b
@@ -2062,14 +2096,14 @@ app.get('/', async function(req, res) {
             if ( linkType == VALID_LINK_TYPES[4] ) {
               streamURL += '&filename=' + gameDate + ' Game Changer'
             }
-            body += '<a href="' + streamURL + '">Game Changer</a>'
-            body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + multiviewquerystring + '" onclick="addmultiview(this, [], excludeTeams)">'
+            body += '<span><a href="' + streamURL + '">Game Changer</a>'
+            body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + multiviewquerystring + '" onclick="addmultiview(this, [], excludeTeams)"></span>'
           } else {
-            body += 'Game Changer'
+            body += '<span>Game Changer</span>'
           }
-          body += '</td></tr>' + "\n"
-          
-          body += '<tr><td><span class="tooltip">' + compareStart.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + compareEnd.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '<span class="tooltiptext">The stream finder stream will automatically switch between games according to your uploaded preferences. This stream is not affiliated with Baseball Reference, do not contact them for support. Visit <a href="http://bit.ly/bbrefsf">http://bit.ly/bbrefsf</a> to create and export your preferences, then upload and save them to mlbserver <a href="#streamfinder">below</a>. Does not support adaptive bitrate switching, will default to 720p60 resolution if not specified.</span></span></td><td>'
+          body += '</div>' + "\n"
+          body += '<div class="flex-between subscriptionStream">' + "\n"
+          body += '<span>' + compareStart.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + compareEnd.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
           if ( (currentDate >= compareStart) && (currentDate < compareEnd) ) {
             let streamURL = server + '/gamechanger.m3u8?streamFinder=on'
             let multiviewquerystring = '/gamechanger.m3u8?streamFinder=on&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION + content_protect_b
@@ -2085,15 +2119,46 @@ app.get('/', async function(req, res) {
             if ( linkType == VALID_LINK_TYPES[4] ) {
               streamURL += '&filename=' + gameDate + ' Stream Finder'
             }
-            body += '<a href="' + streamURL + '">Stream Finder</a>'
-            body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + multiviewquerystring + '" onclick="addmultiview(this, [], excludeTeams)">'
+            body += '<span><a href="' + streamURL + '">Stream Finder</a>'
+            body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + multiviewquerystring + '" onclick="addmultiview(this, [], excludeTeams)"></span>'
           } else {
-            body += 'Stream Finder'
+            body += '<span>Stream Finder</span>'
           }
-          body += '</td></tr>' + "\n"
+          body += '</div>'
         }
       }
     }
+    body += '</div>'
+
+  let SubscriptionStreamsVis = 'is-invisible'
+  if (gameDate == today) {SubscriptionStreamsVis = ''}
+
+      body += `
+      <div class="cardInfoLine ` + SubscriptionStreamsVis + `">Subscription information</div>
+      <div class="infoContainer">
+        <div class="infoContent">
+          <b>MLB Network</b><p>MLB Network live stream is now available in the USA for paid MLBTV subscribers or as a paid add-on, in addition to authenticated TV subscribers. <a href="https://support.mlb.com/s/article/MLB-Network-Streaming-FAQ">See here for more information</a>.</p>
+          <b>Big Inning</b><p>Big Inning is the live look-in and highlights show. <a href="https://support.mlb.com/s/article/What-Is-MLB-Big-Inning">See here for more information</a>.</p>
+          <b>Game Changer</b><p>The game changer stream will automatically switch between the highest leverage active live non-blackout games, and should be available whenever there are such games available. Does not support adaptive bitrate switching, will default to 720p60 resolution if not specified.</p>
+          <b>Stream Finder</b><p>The stream finder stream will automatically switch between games according to your uploaded preferences. This stream is not affiliated with Baseball Reference, do not contact them for support. Visit <a href="http://bit.ly/bbrefsf">http://bit.ly/bbrefsf</a> to create and export your preferences, then upload and save them to mlbserver <a href="#streamfinder">below</a>. Does not support adaptive bitrate switching, will default to 720p60 resolution if not specified.</p>
+          <b>MASN Live & SNLA Live & SNY Live</b><p>Live stream for entitled subscribers.<br>For more information visit: 
+          <a href="https://support.mlb.com/s/article/MASN-In-Market-Offering">MASN</a>      
+          <a href="https://support.mlb.com/s/article/SNLA-Plus-Subscription-Packages">SNLA</a>      
+          <a href="https://support.mlb.com/s/article/SNY-In-Market-Offering"">SNY</a>
+        </div>
+      </div>
+
+      <div class="cardInfoLine cardEnd">Blackouts, shows & free games</div>
+      <div class="infoContainer">
+        <div class="infoContent">
+          <b>Blackouts</b><p>A blackout game is either a live blackout or non-entitled content. Tap or hover over the blackout icon to see an estimate of when the blackout will be lifted (officially ~90 minutes, but more likely ~150 minutes or ~2.5 hours after the game ends).</p>
+          <b>Pre-/Postgame show</b><p>/slashes/ indicates a live pre- and/or post-game show. A /slash before the station indicates a pre-game show; a slash/ after the station indicates a post-game show. Pre- and post-game shows are only available live.</p>
+          <b>Free games</b><p>Free games are available to anyone with an account, no subscription necessary. Blackouts still apply.</p>
+        </div>
+      </div>
+    </div>`
+
+
 
     if ( cache_data.dates && cache_data.dates[0] && cache_data.dates[0].games ) {
       for (var j = 0; j < cache_data.dates[0].games.length; j++) {
@@ -2348,7 +2413,6 @@ app.get('/', async function(req, res) {
 
         // Check if Winter League / MiLB game first
         if ( (cache_data.dates[0].games[j].teams['away'].team.sport.id != levels['MLB']) && (cache_data.dates[0].games[j].teams['home'].team.sport.id != levels['MLB']) && (mediaType == 'MLBTV') ) {
-          body += "<td>"
           if ( cache_data.dates[0].games[j].broadcasts ) {
             let broadcastName = 'N/A'
             for (var k = 0; k < cache_data.dates[0].games[j].broadcasts.length; k++) {
@@ -2732,7 +2796,7 @@ app.get('/', async function(req, res) {
     }
 
     if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-        body += '<p><span class="tooltip">Video<span class="tooltiptext">For video streams only: you can manually specifiy a video track (resolution) to use. Adaptive will let your client choose. Best will select either 1080p60 (MLB) or 720p60 (MiLB). 504p is default for multiview (see below).<br/><br/>None will allow to remove the video tracks, if you just want to listen to the audio while using the "start at inning" or "skip breaks" options enabled.</span></span>: '
+        body += '<span class="tooltip">Video<span class="tooltiptext">For video streams only: you can manually specifiy a video track (resolution) to use. Adaptive will let your client choose. Best will select either 1080p60 (MLB) or 720p60 (MiLB). 504p is default for multiview (see below).<br/><br/>None will allow to remove the video tracks, if you just want to listen to the audio while using the "start at inning" or "skip breaks" options enabled.</span></span>: '
         body += '<button '
         if ( resolution == 'best' ) body += 'class="default" '
         body += 'onclick="resolution=\'best\';reload()">best</button> '
@@ -2741,11 +2805,10 @@ app.get('/', async function(req, res) {
           if ( resolution == VALID_RESOLUTIONS[i] ) body += 'class="default" '
           body += 'onclick="resolution=\'' + VALID_RESOLUTIONS[i] + '\';reload()">' + VALID_RESOLUTIONS[i]
           if ( DISPLAY_BANDWIDTHS[i] != '' ) {
-            body += '<br/><span class="tinytext">' + DISPLAY_BANDWIDTHS[i] + '</span>'
+            body += '<br/><span>' + DISPLAY_BANDWIDTHS[i] + '</span>'
           }
           body += '</button> '
         }
-        body += '</p>' + "\n"
 
         body += '<p><span class="tooltip">Audio<span class="tooltiptext">For video streams only: you can manually specifiy which audio track to include. Some media players can accept them all and let you choose. Not all tracks are available for all games, and injected tracks may not work with skip options below.<br/><br/>If you select "none" for video above, picking an audio track here will make it an audio-only feed that supports the inning start and skip breaks options.</span></span>: '
         for (var i = 0; i < VALID_AUDIO_TRACKS.length; i++) {
@@ -2790,18 +2853,24 @@ app.get('/', async function(req, res) {
           if ( force_vod == VALID_FORCE_VOD[i] ) body += 'class="default" '
           body += 'onclick="force_vod=\'' + VALID_FORCE_VOD[i] + '\';reload()">' + VALID_FORCE_VOD[i] + '</button> '
         }
-        body += '<span class="tinytext">(if client does not support seeking in live streams)</span></p>' + "\n"
+        body += '<span>(if client does not support seeking in live streams)</span></p>' + "\n"
       }
 
+      body += '</div></div>' 
+
       if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-        body += '<table><tr><td><table><tr><td>1</td><td>2</tr><tr><td>3</td><td>4</td></tr></table><td><span class="tooltip">Multiview / Alternate Audio / Sync<span class="tooltiptext">For video streams only: create a new live stream combining 1-4 separate video streams, using the layout shown at left (if more than 1 video stream is selected). Check the boxes next to feeds above to add/remove them, then click "Start" when ready, "Stop" when done watching, or "Restart" to stop and start with the currently selected streams. May take up to 15 seconds after starting before it is ready to play.<br/><br/>No video scaling is performed: defaults to 540p video for each stream, which can combine to make one 1080p stream. Audio defaults to English (TV) audio. If you specify a different audio track instead, you can use the box after each URL below to adjust the sync in seconds (use positive values if audio is early and the audio stream needs to be padded with silence at the beginning to line up with the video; negative values if audio is late, and audio needs to be trimmed from the beginning.)<br/><br/>TIP #1: You can enter just 1 video stream here, at any resolution, to take advantage of the audio sync or alternate audio features without using multiview -- a single video stream will not be re-encoded and will be presented at its full resolution.<br/><br/>TIP #2: You can also manually enter streams from other sources like <a href="https://www.npmjs.com/package/milbserver" target="_blank">milbserver</a> in the boxes below. Make sure any manually entered streams have the desired resolution.<br/><br/>WARNING #1: if the mlbserver process dies or restarts while multiview is active, the ffmpeg encoding process will be orphaned and must be killed manually.<br/><br/>WARNING #2: If you did not specify a hardware encoder for ffmpeg on the command line, this will use your server CPU for encoding. Either way, your system may not be able to keep up with processing 4 video streams at once. Try fewer streams if you have perisistent trouble.</span></span>: <a id="startmultiview" href="" onclick="startmultiview(this);return false">Start'
+        body += '<div class="cardContainer"><div class="cardMenuHeader">Multiview / Alternate Audio / Sync</div><div class="cardContent cardEnd">' + 
+         '<span class="tooltip">Multiview / Alternate Audio / Sync<span class="tooltiptext left">For video streams only: create a new live stream combining 1-4 separate video streams, using the layout shown at left (if more than 1 video stream is selected). Check the boxes next to feeds above to add/remove them, then click "Start" when ready, "Stop" when done watching, or "Restart" to stop and start with the currently selected streams. May take up to 15 seconds after starting before it is ready to play.<br/><br/>No video scaling is performed: defaults to 540p video for each stream, which can combine to make one 1080p stream. Audio defaults to English (TV) audio. If you specify a different audio track instead, you can use the box after each URL below to adjust the sync in seconds (use positive values if audio is early and the audio stream needs to be padded with silence at the beginning to line up with the video; negative values if audio is late, and audio needs to be trimmed from the beginning.)<br/><br/>TIP #1: You can enter just 1 video stream here, at any resolution, to take advantage of the audio sync or alternate audio features without using multiview -- a single video stream will not be re-encoded and will be presented at its full resolution.<br/><br/>TIP #2: You can also manually enter streams from other sources like <a href="https://www.npmjs.com/package/milbserver" target="_blank">milbserver</a> in the boxes below. Make sure any manually entered streams have the desired resolution.<br/><br/>WARNING #1: if the mlbserver process dies or restarts while multiview is active, the ffmpeg encoding process will be orphaned and must be killed manually.<br/><br/>WARNING #2: If you did not specify a hardware encoder for ffmpeg on the command line, this will use your server CPU for encoding. Either way, your system may not be able to keep up with processing 4 video streams at once. Try fewer streams if you have perisistent trouble.</span></span>: <a id="startmultiview" href="" onclick="startmultiview(this);return false">Start'
         if ( ffmpeg_status ) body += 'ed'
         body += '</a> | <a id="stopmultiview" href="" onclick="stopmultiview(this);return false">Stop'
         if ( !ffmpeg_status ) body += 'ped'
-        body += '</a><br/>' + "\n"
-        body += '<span class="tinytext">(check boxes next to games to add, then click "Start";<br/>must click "Stop" link above when done, or manually kill ffmpeg)</span></td></tr><tr><td colspan="2">' + "\n"
+        body += '</a><br/>' + "\n" +
+        '<div style="display: flex; align-items: flex-start; gap: 10px;"><div class="square-grid"><div>1</div><div>2</div><div>3</div><div>4</div></div>' 
+       
+        body +=  '<span>(check boxes next to games to add, then click "Start"; must click "Stop" link above when done, or manually kill ffmpeg)</span></div>' + ''
+
         for (var i=1; i<=4; i++) {
-          body += i + ': <textarea id="multiview' + i + '" rows=2 cols=60 oninput="this.value=stream_substitution(this.value)"></textarea>'
+          body += i + ': <textarea id="multiview' + i + '" oninput="this.value=stream_substitution(this.value)"></textarea>'
           body += '<input type="number" id="sync' + i + '" value="0.0" step=".1" style="vertical-align:top;font-size:.8em;width:3em"/>'
           body += '<br/>' + "\n"
         }
@@ -2813,10 +2882,10 @@ app.get('/', async function(req, res) {
         body += '<hr>Watch: <a href="' + http_root + '/embed.html?msrc=' + encodeURIComponent(multiview_stream_url) + content_protect_b + '">Embed</a> | <a href="' + http_root + '/stream.m3u8?src=' + encodeURIComponent(multiview_stream_url) + content_protect_b + '">Stream</a> | <a href="' + http_root + '/chromecast.html?msrc=' + encodeURIComponent(multiview_stream_url) + content_protect_b + '">Chromecast</a> | <a href="' + http_root + '/advanced.html?msrc=' + encodeURIComponent(multiview_stream_url) + content_protect_b + '">Advanced</a> | <a href="' + http_root + '/download.ts?src=' + encodeURIComponent(multiview_stream_url) + content_protect_b + '&filename=' + gameDate + ' Multiview">Download</a><br/><span>Kodi STRM files: <a href="' + http_root + '/kodi.strm?src=' + encodeURIComponent(multiview_stream_url) + content_protect_b + '">Matrix/19+</a> (<a href="' + http_root + '/kodi.strm?version=18&src=' + encodeURIComponent(multiview_stream_url) + content_protect_b + '">Leia/18</a>)</span>'
         body += '</div>' + "\n"
     
-        body += '<table><tr><td><p><a name="streamfinder"/><span class="tooltip">Stream Finder Settings<span class="tooltiptext">Automatically switches between games according to your preferences. This program is not affiliated with Baseball Reference, do not contact them for support.</span></span></p><p><a download="mlbserverStreamFinder.txt" href="' + http_root + '/downloadsettings' + content_protect_a + '">Click to Download Currently Stored Settings</a></p><p><b><u>Step 1</b></u><br/>Export and download your desired Stream Finder settings at this link:<br/><a href="https://www.baseball-reference.com/stream-finder.shtml" target="_blank">https://www.baseball-reference.com/stream-finder.shtml</a></p><form method="POST" enctype="multipart/form-data" action="' + http_root + '/upload' + content_protect_a + '"><p><b><u>Step 2</b></u><br/>Click this button and select the settings file you just downloaded:<br/><input name="file" type="file" onchange="form.submit()"/></p></form></td></tr></table><br/>' + "\n"
+        body += '<div class="cardContainer"><div class="cardMenuHeader">Stream finder settings</div><div class="cardContent"><a download="mlbserverStreamFinder.txt" href="' + http_root + '/downloadsettings' + content_protect_a + '">Click to Download Currently Stored Settings</a></p><b>Step 1</b><br/>Export and download your desired Stream Finder settings at this link:<br/><a href="https://www.baseball-reference.com/stream-finder.shtml" target="_blank">https://www.baseball-reference.com/stream-finder.shtml</a><form method="POST" enctype="multipart/form-data" action="' + http_root + '/upload' + content_protect_a + '"><br><b>Step 2</b><br/>Click this button and select the settings file you just downloaded:<br/><input name="file" type="file" onchange="form.submit()"/></form></div><div class="cardInfoLine cardEnd">How it works</div><div class="infoContainer"><div class="infoContent">Automatically switches between games according to your preferences. This program is not affiliated with Baseball Reference, do not contact them for support.</div></div></div></div>' + "\n"
     }
 
-    body += '<table><tr><td>' + "\n"
+    body += '<div class="cardContainer"><div class="cardMenuHeader">Live Channel Playlist, XMLTV Guide, ICS Calendar</div><div class="cardContent cardEnd">' + "\n"
 
     body += '<span class="tooltip">Live Channel Playlist, XMLTV Guide, ICS Calendar<span class="tooltiptext left">Allows you to generate a M3U playlist of channels, and an XML file of guide listings for those channels, to import into TV/DVR/PVR software like Tvheadend or Jellyfin. You can also subscribe to the calendar links in your preferred calendar program/service to set up event notifications.<br/><br/>NOTE: May be helpful to specify a resolution above.</span></span>:' + "\n"
 
@@ -2826,7 +2895,7 @@ app.get('/', async function(req, res) {
       if ( scan_mode == VALID_SCAN_MODES[i] ) body += 'class="default" '
       body += 'onclick="scan_mode=\'' + VALID_SCAN_MODES[i] + '\';reload()">' + VALID_SCAN_MODES[i] + '</button> '
     }
-    body += ' <span class="tinytext">(ON plays sample for all stream requests)</span></p>' + "\n"
+    body += ' <span>(ON plays sample for all stream requests)</span></p>' + "\n"
 
     if ( !req.query.resolution ) {
       resolution = 'best'
@@ -2891,11 +2960,9 @@ app.get('/', async function(req, res) {
 
     body += '<p><span class="tooltip">Create Off Air events between games<span class="tooltiptext right">An optional parameter added to the URL will create "Off Air" events in the XML guide, listing the time of the next game on that channel. A value of "channels" will format the events in the style of the <a href="https://community.getchannels.com/t/mlb-tv-for-channels/27492">legacy Channels container</a>.</span></span>: <a href="' + http_root + '/guide.xml?mediaType=' + mediaType + '&includeTeams=' + include_teams + '&offAir=true' + content_protect_b + '">guide.xml</a> or <a href="' + http_root + '/guide.xml?mediaType=' + mediaType + '&includeTeams=' + include_teams + '&offAir=channels' + content_protect_b + '">legacy</a></p>' + "\n"
 
-    body += '</td></tr></table><br/>' + "\n"
+    body += '</div></div>' + "\n"
 
-    body += '<table><tr><td>' + "\n"
-    body += '<p><span class="tooltip">Example links<span class="tooltiptext">Some examples how to generate predictable links.</span></span>:</p>' + "\n"
-    body += '<p>' + "\n"
+    body += '<div class="cardContainer"><div class="cardMenuHeader">Example links</div><div class="cardContent cardEnd">'
     let example_types = [ ['embed.html', 'Embed'], ['stream.m3u8', 'Stream'], ['chromecast.html', 'Chromecast'], ['kodi.strm', 'Kodi'] ]
 
     let example_team = 'ath'
@@ -2933,10 +3000,9 @@ app.get('/', async function(req, res) {
         }
       }
     }
-    body += '</p>' + "\n"
 
     include_teams = 'ath,atl'
-    body += '<p><span class="tooltip">Game Changer by team examples<span class="tooltiptext">Game Changer supports specifying certain teams to include or exclude. Useful for following a group of teams.</span></span>:</p>' + "\n"
+    body += '<p><span class="tooltip">Game Changer by team examples<span class="tooltiptext right">Game Changer supports specifying certain teams to include or exclude. Useful for following a group of teams.</span></span>:</p>' + "\n"
     body += '<p>' + "\n"
     let gamechanger_streamURL = server + '/gamechanger.m3u8?resolution=best' + content_protect_b
     let gamechanger_types = ['in', 'ex']
@@ -2945,15 +3011,15 @@ app.get('/', async function(req, res) {
       body += '&bull; ' + gamechanger_types[i] + 'clude: <a href="' + http_root + '/embed.html?src=' + encodeURIComponent(example_streamURL) + '&startFrom=' + VALID_START_FROM[1] + content_protect_b + '">Embed</a> | <a href="' + example_streamURL + '">Stream</a> | <a href="' + http_root + '/chromecast.html?src=' + encodeURIComponent(example_streamURL) + content_protect_b + '">Chromecast</a> | <a href="' + http_root + '/advanced.html?src=' + encodeURIComponent(example_streamURL) + content_protect_b + '">Advanced</a> | <a href="' + http_root + '/kodi.strm?src=' + encodeURIComponent(example_streamURL) + content_protect_b + '">Kodi</a><br/>' + "\n"
     }
     
-    body += '<p><span class="tooltip">Comskip link examples<span class="tooltiptext">You can generate a <a href="https://github.com/erikkaashoek/Comskip">Comskip</a>-style file to automatically skip sections (breaks, idle time, or non-action pitches) of games you record using DVR software when watched in compatible players. For example, if you record a game from your local OTA channel using Tvheadend, you can then fetch one of these Comskip files, put it in the same directory with the same name as your recorded video file, and Kodi will automatically skip those sections while you watch the video.<br><br>Specifying the team and broadcast_start_timestamp in the URL is required! For the timestamp, use the  time your DVR software began the recording. This should be your local time in YYYY-MM-DDTHH:MM:SS format.<br><br>Specifying a skip_adjust value in the URL is recommended, to adjust for broadcast delays. This will vary across different channels and different video sources.<br><br>For the txt file format, specifying the video frame rate (fps) in the URL is also required. This will commonly be either 30, 59.94, or 60, depending on your video source.<br><br>Optionally, setting pad to "on" will generate random extra skips at the end, to help avoid timeline spoilers.</span></span>: <a href="' + http_root + '/comskip.edl?team=CHC&date=2025-10-01&pad=on&skip=pitches&skip_adjust=11&broadcast_start_timestamp=2025-10-01T14:00:00' + content_protect_a + '">comskip.edl</a> or <a href="' + http_root + '/comskip.txt?team=CHC&date=2025-10-01&pad=on&skip=pitches&skip_adjust=11&broadcast_start_timestamp=2025-10-01T14:00:00&fps=59.94' + content_protect_a + '">comskip.txt</a></p>' + "\n"
+    body += '<p><span class="tooltip">Comskip link examples<span class="tooltiptext right">You can generate a <a href="https://github.com/erikkaashoek/Comskip">Comskip</a>-style file to automatically skip sections (breaks, idle time, or non-action pitches) of games you record using DVR software when watched in compatible players. For example, if you record a game from your local OTA channel using Tvheadend, you can then fetch one of these Comskip files, put it in the same directory with the same name as your recorded video file, and Kodi will automatically skip those sections while you watch the video.<br><br>Specifying the team and broadcast_start_timestamp in the URL is required! For the timestamp, use the  time your DVR software began the recording. This should be your local time in YYYY-MM-DDTHH:MM:SS format.<br><br>Specifying a skip_adjust value in the URL is recommended, to adjust for broadcast delays. This will vary across different channels and different video sources.<br><br>For the txt file format, specifying the video frame rate (fps) in the URL is also required. This will commonly be either 30, 59.94, or 60, depending on your video source.<br><br>Optionally, setting pad to "on" will generate random extra skips at the end, to help avoid timeline spoilers.</span></span>: <a href="' + http_root + '/comskip.edl?team=CHC&date=2025-10-01&pad=on&skip=pitches&skip_adjust=11&broadcast_start_timestamp=2025-10-01T14:00:00' + content_protect_a + '">comskip.edl</a> or <a href="' + http_root + '/comskip.txt?team=CHC&date=2025-10-01&pad=on&skip=pitches&skip_adjust=11&broadcast_start_timestamp=2025-10-01T14:00:00&fps=59.94' + content_protect_a + '">comskip.txt</a></p>' + "\n"
     
-    body += '<p><span class="tooltip">MPEG-TS examples<span class="tooltiptext">Experimental feature: a MPEGTS output format where you can adjust the audio sync with a URL parameter. Useful if the radio track is a consistent number of seconds ahead or behind the video track. Use positive sync values if radio is early, or negative values if radio is late.</span></span>: <a href="' + http_root + '/stream.ts?team=' + example_team + content_protect_a + '">Stream</a> or <a href="' + http_root + '/stream.ts?team=' + example_team + '&audio_track=radio&sync=2.3' + content_protect_a + '">Stream w/ radio sync</a></p>' + "\n"
+    body += '<p><span class="tooltip">MPEG-TS examples<span class="tooltiptext right">Experimental feature: a MPEGTS output format where you can adjust the audio sync with a URL parameter. Useful if the radio track is a consistent number of seconds ahead or behind the video track. Use positive sync values if radio is early, or negative values if radio is late.</span></span>: <a href="' + http_root + '/stream.ts?team=' + example_team + content_protect_a + '">Stream</a> or <a href="' + http_root + '/stream.ts?team=' + example_team + '&audio_track=radio&sync=2.3' + content_protect_a + '">Stream w/ radio sync</a></p>' + "\n"
 
-    body += '</p></td></tr></table><br/>' + "\n"
+    body += '</p></div><br/>' + "\n"
 
-    body += '<p><span class="tooltip">Sample video<span class="tooltiptext">A sample stream. Useful for testing and troubleshooting.</span></span>: <a href="' + http_root + '/embed.html' + content_protect_a + '">Embed</a> | <a href="' + http_root + '/stream.m3u8' + content_protect_a + '">Stream</a> | <a href="' + http_root + '/chromecast.html' + content_protect_a + '">Chromecast</a> | <a href="' + http_root + '/advanced.html' + content_protect_a + '">Advanced</a></p>' + "\n"
+    body += '<p><span class="tooltip">Sample video<span class="tooltiptext right">A sample stream. Useful for testing and troubleshooting.</span></span>: <a href="' + http_root + '/embed.html' + content_protect_a + '">Embed</a> | <a href="' + http_root + '/stream.m3u8' + content_protect_a + '">Stream</a> | <a href="' + http_root + '/chromecast.html' + content_protect_a + '">Chromecast</a> | <a href="' + http_root + '/advanced.html' + content_protect_a + '">Advanced</a></p>' + "\n"
 
-    body += '<p><span class="tooltip">Bookmarklets for MLB.com<span class="tooltiptext">If you watch at MLB.com, drag these bookmarklets to your bookmarks toolbar and use them to hide parts of the interface.</span></span>: <a href="javascript:(function(){let x=document.querySelector(\'#mlbtv-stats-panel\');if(x.style.display==\'none\'){x.style.display=\'initial\';}else{x.style.display=\'none\';}})();">Boxscore</a> | <a href="javascript:(function(){let x=document.querySelector(\'.mlbtv-header-container\');if(x.style.display==\'none\'){let y=document.querySelector(\'.mlbtv-players-container\');y.style.display=\'none\';x.style.display=\'initial\';setTimeout(function(){y.style.display=\'initial\';},15);}else{x.style.display=\'none\';}})();">Scoreboard</a> | <a href="javascript:(function(){let x=document.querySelector(\'.mlbtv-container--footer\');if(x.style.display==\'none\'){let y=document.querySelector(\'.mlbtv-players-container\');y.style.display=\'none\';x.style.display=\'initial\';setTimeout(function(){y.style.display=\'initial\';},15);}else{x.style.display=\'none\';}})();">Linescore</a> | <a href="javascript:(function(){let x=document.querySelector(\'#mlbtv-stats-panel\');if(x.style.display==\'none\'){x.style.display=\'initial\';}else{x.style.display=\'none\';}x=document.querySelector(\'.mlbtv-header-container\');if(x.style.display==\'none\'){x.style.display=\'initial\';}else{x.style.display=\'none\';}x=document.querySelector(\'.mlbtv-container--footer\');if(x.style.display==\'none\'){let y=document.querySelector(\'.mlbtv-players-container\');y.style.display=\'none\';x.style.display=\'initial\';setTimeout(function(){y.style.display=\'initial\';},15);}else{x.style.display=\'none\';}})();">All</a></p>' + "\n"
+    body += '<p><span class="tooltip">Bookmarklets for MLB.com<span class="tooltiptext right">If you watch at MLB.com, drag these bookmarklets to your bookmarks toolbar and use them to hide parts of the interface.</span></span>: <a href="javascript:(function(){let x=document.querySelector(\'#mlbtv-stats-panel\');if(x.style.display==\'none\'){x.style.display=\'initial\';}else{x.style.display=\'none\';}})();">Boxscore</a> | <a href="javascript:(function(){let x=document.querySelector(\'.mlbtv-header-container\');if(x.style.display==\'none\'){let y=document.querySelector(\'.mlbtv-players-container\');y.style.display=\'none\';x.style.display=\'initial\';setTimeout(function(){y.style.display=\'initial\';},15);}else{x.style.display=\'none\';}})();">Scoreboard</a> | <a href="javascript:(function(){let x=document.querySelector(\'.mlbtv-container--footer\');if(x.style.display==\'none\'){let y=document.querySelector(\'.mlbtv-players-container\');y.style.display=\'none\';x.style.display=\'initial\';setTimeout(function(){y.style.display=\'initial\';},15);}else{x.style.display=\'none\';}})();">Linescore</a> | <a href="javascript:(function(){let x=document.querySelector(\'#mlbtv-stats-panel\');if(x.style.display==\'none\'){x.style.display=\'initial\';}else{x.style.display=\'none\';}x=document.querySelector(\'.mlbtv-header-container\');if(x.style.display==\'none\'){x.style.display=\'initial\';}else{x.style.display=\'none\';}x=document.querySelector(\'.mlbtv-container--footer\');if(x.style.display==\'none\'){let y=document.querySelector(\'.mlbtv-players-container\');y.style.display=\'none\';x.style.display=\'initial\';setTimeout(function(){y.style.display=\'initial\';},15);}else{x.style.display=\'none\';}})();">All</a></p>' + "\n"
 
     // Print version
     body += '<p class="tinytext">Version ' + version + ' (<a href="' + http_root + '/clearcache">clear session and cache</a>)</p>' + "\n"
