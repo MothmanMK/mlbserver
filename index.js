@@ -1709,7 +1709,7 @@ app.get('/', async function(req, res) {
 
     var body = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="Content-type" content="text/html;charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"><title>' + appname + '</title><link rel="icon" href="favicon.svg' + content_protect_a + '"><link rel="stylesheet" href="/style.css">'
 
-    body += '</style><script type="text/javascript">' + "\n";
+    body += '<script type="text/javascript">' + "\n";
 
     // Define option variables in page
     body += 'var date="' + gameDate + '";var level="' + level + '";var org="' + org + '";var mediaType="' + mediaType + '";var resolution="' + resolution + '";var audio_track="' + audio_track + '";var captions="' + captions + '";var force_vod="' + force_vod + '";var inning_half="' + inning_half + '";var inning_number="' + inning_number + '";var skip="' + skip + '";var skip_adjust="' + skip_adjust + '";var pad="' + pad + '";var linkType="' + linkType + '";var startFrom="' + startFrom + '";var scores="' + scores + '";var controls="' + controls + '";var scan_mode="' + scan_mode + '";var content_protect="' + content_protect + '";' + "\n"
