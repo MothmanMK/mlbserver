@@ -2113,24 +2113,46 @@ app.get('/', async function(req, res) {
           hometeam_level = session.getLevelNameFromSportId(cache_data.dates[0].games[j].teams['home'].team.sport.id)
         }
 
-        let teams = ""
+        let awayDisplay = awayteam
+        let homeDisplay = hometeam
+
         if ( awayteam_abbr ) {
-          teams += '<span class="tooltip">' + awayteam + '<span class="tooltiptext">Team Abbreviation: ' + awayteam_abbr + ', level ' + awayteam_level + '</span></span>'
-        } else {
-          teams += awayteam
+          awayDisplay =
+            '<span class="tooltip">' +
+            awayteam +
+            '<span class="tooltiptext left">' +
+            awayteam_abbr + ' (' + awayteam_level  + ')' +
+            '</span></span>'
         }
-        teams += " @ "
+
         if ( hometeam_abbr ) {
-          teams += '<span class="tooltip">' + hometeam + '<span class="tooltiptext">Team Abbreviation: ' + hometeam_abbr + ', level ' + hometeam_level + '</span></span>'
-        } else {
-          teams += hometeam
+          homeDisplay =
+            '<span class="tooltip">' +
+            hometeam +
+            '<span class="tooltiptext right">' +
+            hometeam_abbr + ' (' + hometeam_level  + ')' + 
+            '</span></span>'
         }
-        let filename_teams = awayteam + " @ " + hometeam
-        let pitchers = ""
-        let state = "<br/>"
+
+        let filename_teams = awayteam + ' @ ' + hometeam
+        let awayPitcher = 'TBD'
+        let homePitcher = 'TBD'
+        let state = ''
+
+        let awayscore = ''
+        let homescore = ''
+        
+        let streamHtml = ''
+
+        let noteworthyTag = ''
+        let noteworthyTooltip = ''
+        let noteworthyCSS = ''
+        let actionHtml = ''
+        let tooltipCSS = ''
+        let tooltipTextCSS = ''
 
         if ( cache_data.dates[0].games[j].status.startTimeTBD == true ) {
-          state += "Time TBD"
+          state = 'Time TBD'
         } else {
           let startTime = new Date(cache_data.dates[0].games[j].gameDate)
           state += startTime.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
@@ -2144,8 +2166,8 @@ app.get('/', async function(req, res) {
         relative_inning = relative_inning < 0 ? 0 : relative_inning
         //if ( (scores == VALID_SCORES[1]) && (cache_data.dates[0].games[j].gameUtils.isLive || cache_data.dates[0].games[j].gameUtils.isFinal) && !cache_data.dates[0].games[j].gameUtils.isCancelled && !cache_data.dates[0].games[j].gameUtils.isPostponed ) {
         if ( (scores == VALID_SCORES[1]) && (abstractGameState != 'Preview') && (detailedState != 'Postponed') ) {
-          let awayscore = ''
-          let homescore = ''
+          awayscore = ''
+          homescore = ''
           if ( (inning_number != VALID_INNING_NUMBER[0]) && cache_data.dates[0].games[j].linescore && cache_data.dates[0].games[j].linescore.innings ) {
             awayscore = 0
             homescore = 0
@@ -2175,59 +2197,82 @@ app.get('/', async function(req, res) {
               }
             }
             if ( display_inning != '' ) {
-              state = "<br/>" + display_inning
+              state = display_inning
             }
           } else {
             awayscore = cache_data.dates[0].games[j].teams['away'].score
             homescore = cache_data.dates[0].games[j].teams['home'].score
-            //if ( cache_data.dates[0].games[j].gameUtils.isLive && !cache_data.dates[0].games[j].gameUtils.isFinal ) {
+             //if ( cache_data.dates[0].games[j].gameUtils.isLive && !cache_data.dates[0].games[j].gameUtils.isFinal ) {
             if ( abstractGameState == 'Live' ) {
-              state = "<br/>" + cache_data.dates[0].games[j].linescore.inningHalf.substr(0,1) + cache_data.dates[0].games[j].linescore.currentInning
+              state = cache_data.dates[0].games[j].linescore.inningHalf.substr(0,1) + cache_data.dates[0].games[j].linescore.currentInning
             //} else if ( cache_data.dates[0].games[j].gameUtils.isFinal ) {
             } else if ( abstractGameState == 'Final' ) {
-              state = "<br/>" + detailedState
+              state = detailedState
             }
             if ( cache_data.dates[0].games[j].flags ) {
               if ( cache_data.dates[0].games[j].flags.perfectGame == true ) {
-                state += "<br/>Perfect Game"
+                noteworthyTag = 'PG'
+                noteworthyTooltip = 'Perfect Game'
+                noteworthyCSS = 'tag noteworthy'
+                tooltipCSS = 'tooltip'
+                tooltipTextCSS = 'tooltiptext'
               } else if ( cache_data.dates[0].games[j].flags.noHitter == true ) {
-                state += "<br/>No-Hitter"
+                noteworthyTag = 'NH'
+                noteworthyTooltip = 'No-Hitter'
+                noteworthyCSS = 'tag noteworthy'
+                tooltipCSS = 'tooltip'
+                tooltipTextCSS = 'tooltiptext'
+              } else { 
+                noteworthyTag = '-'
               }
             }
           }
-          teams = awayteam + " " + awayscore + " @ " + hometeam + " " + homescore
-        //} else if ( cache_data.dates[0].games[j].gameUtils.isCancelled || cache_data.dates[0].games[j].gameUtils.isPostponed || cache_data.dates[0].games[j].gameUtils.isSuspended ) {
+          //} else if ( cache_data.dates[0].games[j].gameUtils.isCancelled || cache_data.dates[0].games[j].gameUtils.isPostponed || cache_data.dates[0].games[j].gameUtils.isSuspended ) {
         } else if ( detailedState == 'Postponed' ) {
-          state = "<br/>" + detailedState
-        //} else if ( cache_data.dates[0].games[j].gameUtils.isDelayed ) {
+          state = detailedState
+           //} else if ( cache_data.dates[0].games[j].gameUtils.isDelayed ) {
         } else if ( detailedState.startsWith('Delayed') ) {
-          state += "<br/>" + detailedState
+         state = detailedState
         }
 
-        var filename = gameDate + ' ' + filename_teams + ' '
+         var filename = gameDate + ' ' + filename_teams + ' '
+
+        let scheduleVis = 'is-invisible'
+        let doubleHeaderVis = 'is-invisible'
+        let inningsVis = 'is-invisible'
+        let blackoutVis = 'is-invisible'
+        let blackoutToolTipVis = 'is-invisible'
+        let blackoutType = ''
+        let blackoutExpiry = ''
+        
+        let scheduleDesc = ''
+        let gameNo = ''
+        let resumeText = ''
 
         if ( cache_data.dates[0].games[j].doubleHeader != 'N'  ) {
-          state += "<br/>Game " + cache_data.dates[0].games[j].gameNumber
+          gameNo = cache_data.dates[0].games[j].gameNumber
+          doubleHeaderVis = ''
           filename += 'Game ' + cache_data.dates[0].games[j].gameNumber + ' '
         }
         if ( cache_data.dates[0].games[j].description ) {
-          state += "<br/>" + cache_data.dates[0].games[j].description
+          scheduleDesc = cache_data.dates[0].games[j].description
+          scheduleVis = ''
         }
         if ( scheduledInnings != '9' ) {
-          state += "<br/>" + scheduledInnings + "-inning game"
+          inningsVis = ''
         }
         var resumeStatus = false
         if ( cache_data.dates[0].games[j].resumeGameDate || cache_data.dates[0].games[j].resumedFromDate ) {
-          state += '<br/>Resum'
+          let resumeText = ''
           let resumeDate
           if ( cache_data.dates[0].games[j].resumeGameDate ) {
             resumeDate = new Date(cache_data.dates[0].games[j].resumeDate)
-            state += 'ing on'
+            resumeText += 'Resuming on'
           } else {
             resumeDate = new Date(cache_data.dates[0].games[j].resumedFrom)
-            state += 'ed from'
+            resumeText += 'Resumed from'
           }
-          state += '<br/>' + resumeDate.toLocaleString('default', { month: 'long', day: 'numeric' })
+          resumeText += '' + resumeDate.toLocaleString('default', { month: 'long', day: 'numeric' })
           // Also show the status by the media links, if one of them is live
           resumeStatus = 'archived'
           if ( (typeof cache_data.dates[0].games[j].broadcasts) != 'undefined' ) {
@@ -2241,27 +2286,23 @@ app.get('/', async function(req, res) {
         }
 
         if ( (cache_data.dates[0].games[j].teams['away'].probablePitcher && cache_data.dates[0].games[j].teams['away'].probablePitcher.fullName) || (cache_data.dates[0].games[j].teams['home'].probablePitcher && cache_data.dates[0].games[j].teams['home'].probablePitcher.fullName) ) {
-          pitchers = "<br/>"
           if ( cache_data.dates[0].games[j].teams['away'].probablePitcher && cache_data.dates[0].games[j].teams['away'].probablePitcher.fullName ) {
             if ( cache_data.dates[0].games[j].teams['away'].team.sport.name != 'Major League Baseball' ) {
-              pitchers += cache_data.dates[0].games[j].teams['away'].probablePitcher.fullName
+              awayPitcher = cache_data.dates[0].games[j].teams['away'].probablePitcher.fullName
             } else {
-              pitchers += getLastName(cache_data.dates[0].games[j].teams['away'].probablePitcher.fullName)
+              awayPitcher = getLastName(cache_data.dates[0].games[j].teams['away'].probablePitcher.fullName)
             }
-            pitchers += '</a>'
           } else {
-            pitchers += 'TBD'
+            awayPitcher = 'TBD'
           }
-          pitchers += ' vs '
           if ( cache_data.dates[0].games[j].teams['home'].probablePitcher && cache_data.dates[0].games[j].teams['home'].probablePitcher.fullName ) {
             if ( cache_data.dates[0].games[j].teams['home'].team.sport.name != 'Major League Baseball' ) {
-              pitchers += cache_data.dates[0].games[j].teams['home'].probablePitcher.fullName
+              homePitcher = cache_data.dates[0].games[j].teams['home'].probablePitcher.fullName
             } else {
-              pitchers += getLastName(cache_data.dates[0].games[j].teams['home'].probablePitcher.fullName)
+              homePitcher = getLastName(cache_data.dates[0].games[j].teams['home'].probablePitcher.fullName)
             }
-            pitchers += '</a>'
           } else {
-            pitchers += 'TBD'
+            homePitcher = 'TBD'
           }
         }
 
@@ -2295,7 +2336,10 @@ app.get('/', async function(req, res) {
               }
             }
             if ( broadcastName == 'N/A' ) {
-              body += broadcastName
+              streamHtml +=
+                '<span>' +
+                '<span class="text-left">' + broadcastName + '</span>' +
+                '</span>'
             } else {
               // Check if game should be live
               if ( (cache_data.dates[0].games[j].status.detailedState != 'Postponed') && (cache_data.dates[0].games[j].status.detailedState != 'Cancelled') ) {
@@ -2341,21 +2385,30 @@ app.get('/', async function(req, res) {
                   }
                   querystring += content_protect_b
                   multiviewquerystring += content_protect_b
-                  body += '<a href="' + thislink + querystring + '">' + broadcastName + '</a>'
-                  body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this)">'
+
+                  streamHtml +=
+                    '<span>' +
+                    '<input type="checkbox" value="http://127.0.0.1:' +
+                    session.data.port +
+                    '/stream.m3u8' +
+                    multiviewquerystring +
+                    '" onclick="addmultiview(this)">' +
+                    '<span class="text-left">' +
+                    '<a href="' + thislink + querystring + '">' + broadcastName + '</a>' +
+                    '</span>' +
+                    '</span>'
                 } else {
-                  body += broadcastName
+                  streamHtml +=
+                    '<span>' +
+                    '<span class="text-left">' + broadcastName + '</span>' +
+                    '</span>'
                 }
               }
             }
           }
-          body += "</td>"
         } else {
           // Begin MLB games
-          if ( (typeof cache_data.dates[0].games[j].broadcasts) == 'undefined' ) {
-            body += "<td></td>"
-          } else {
-            body += "<td>"
+          if ( (typeof cache_data.dates[0].games[j].broadcasts) != 'undefined' ) {
             for (var k = 0; k < cache_data.dates[0].games[j].broadcasts.length; k++) {
               let broadcast = cache_data.dates[0].games[j].broadcasts[k]
               if ( broadcast.availableForStreaming ) {
@@ -2366,10 +2419,10 @@ app.get('/', async function(req, res) {
                   mediaTitle = 'Spanish'
                 }
                 if ( mediaTitle == mediaType ) {
-                  // for video, check that it's not in-market
-                  /*if ( (mediaType == 'MLBTV') && await session.check_in_market(cache_data.dates[0].games[j].content.media.epg[k].items[x]) ) {
-                    continue
-                  }*/
+                // for video, check that it's not in-market
+                /*if ( (mediaType == 'MLBTV') && await session.check_in_market(cache_data.dates[0].games[j].content.media.epg[k].items[x]) ) {
+                  continue
+                }*/
 
                   // check if language is not set (video) or it matches requested language
                   if ( broadcast.language == language ) {
@@ -2384,7 +2437,7 @@ app.get('/', async function(req, res) {
                       }
                     }
                     let station = broadcast.callSign
-                    
+
                     if ( pre_post_shows.pregame_shows && pre_post_shows.pregame_shows[broadcast.mediaId] ) {
                       station = '/' + station
                     }
@@ -2392,20 +2445,17 @@ app.get('/', async function(req, res) {
                       station += '/'
                     }
 
-                    // display blackout tooltip, if necessary
                     if ( blackouts[gamePk] && blackouts[gamePk].blackout_feeds && blackouts[gamePk].blackout_feeds.includes(broadcast.mediaId) ) {
-                      body += '<span class="tooltip"><span class="blackout">' + teamabbr + '</span><span class="tooltiptext">' + blackouts[gamePk].blackout_type
-                      if ( blackouts[gamePk].blackout_type != 'Not entitled' ) {
-                        body += ' video blackout until approx. 2.5 hours after the game'
-                        if ( blackouts[gamePk].blackoutExpiry ) {
-                          body += ' (~' + blackouts[gamePk].blackoutExpiry.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ')'
-                        }
+                      blackoutVis = '' 
+                      blackoutType = blackouts[gamePk].blackout_type
+
+                      if ( blackoutType != 'Not entitled' ) {
+                      blackoutToolTipVis = ''
+                      blackoutExpiry = blackouts[gamePk].blackoutExpiry.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) 
                       }
-                      body += '</span></span>'
-                    } else {
-                      body += teamabbr
                     }
-                    body += ': '
+
+                    let streamPrefix = teamabbr + ': '
 
                     if ( broadcast.mediaState && broadcast.mediaState.mediaStateCode && ((broadcast.mediaState.mediaStateCode == 'MEDIA_ON') || (broadcast.mediaState.mediaStateCode == 'MEDIA_ARCHIVE') || (abstractGameState == 'Final')) ) {
                       let gameTime = new Date(cache_data.dates[0].games[j].gameDate)
@@ -2414,10 +2464,16 @@ app.get('/', async function(req, res) {
                         game_started = true
                       }
                       let mediaId = broadcast.mediaId
-                      if ( (mediaType == 'MLBTV') && (gameDate == today) && session.cache.media && session.cache.media[mediaId] && session.cache.media[mediaId].blackout && session.cache.media[mediaId].blackoutExpiry && (new Date(session.cache.media[mediaId].blackoutExpiry) > new Date()) ) {
-                        body += '<span class="blackout">' + station + '</span>'
+                         if ( (mediaType == 'MLBTV') && (gameDate == today) && session.cache.media && session.cache.media[mediaId] && session.cache.media[mediaId].blackout && session.cache.media[mediaId].blackoutExpiry && (new Date(session.cache.media[mediaId].blackoutExpiry) > new Date()) ) {
+                        streamHtml +=
+                          '<span>' +
+                          '<span class="text-left">' +
+                          streamPrefix +
+                          '<span class="blackoutstation">' + station + '</span>' +
+                          '</span>' +
+                          '</span>'
                       } else {
-                        let querystring
+                        let querystring 
                         querystring = '?mediaId=' + mediaId
 
                         let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
@@ -2454,92 +2510,199 @@ app.get('/', async function(req, res) {
                         }
                         querystring += content_protect_b
                         multiviewquerystring += content_protect_b
-                        stationlink = '<a' + fav_style + ' href="' + thislink + querystring + '">' + station + '</a>'
+                        stationlink = '<a' + ' href="' + thislink + querystring + '">' + station + '</a>'
+
+                        let streamStationHtml = stationlink
 
                         if ( blackouts[gamePk] && blackouts[gamePk].blackout_feeds && blackouts[gamePk].blackout_feeds.includes(broadcast.mediaId) ) {
-                          body += '<span class="blackout">' + stationlink + '</span>'
-                        } else {
-                          body += stationlink
+                          streamStationHtml = '<span class="blackout">' + stationlink + '</span>'
                         }
+
+                        streamHtml += '<span>'
+
                         if ( mediaType == 'MLBTV' ) {
-                          body += '<input type="checkbox" value="http://127.0.0.1:' + session.data.port + '/stream.m3u8' + multiviewquerystring + '" onclick="addmultiview(this, [\'' + awayteam + '\', \'' + hometeam + '\'])">'
+                          streamHtml +=
+                            '<input type="checkbox" value="http://127.0.0.1:' +
+                            session.data.port +
+                            '/stream.m3u8' +
+                            multiviewquerystring +
+                            '" onclick="addmultiview(this, [\'' +
+                            awayteam +
+                            '\', \'' +
+                            hometeam +
+                            '\'])">'
                         }
+
+                        streamHtml +=
+                          '<span class="text-left">' +
+                          streamPrefix +
+                          streamStationHtml
+
                         if ( resumeStatus ) {
-                          body += '('
+                          streamHtml += '('
                           // for suspended games that haven't finished yet, we can simply use the mediaState to determine the status
+
                           if ( resumeStatus == 'live' ) {
                             if ( broadcast.mediaState.mediaStateCode == 'MEDIA_ARCHIVE' ) {
-                              body += '1'
+                              streamHtml += '1'
                             } else {
-                              body += '2'
+                              streamHtml += '2'
                             }
-                          // otherwise, for completed games, we need to check the airings data
-                          } else {
-                            /*airings_data = await session.getAiringsData('', cache_data.dates[0].games[j].gamePk)
-                            if ( airings_data.data && airings_data.data.Airings && (airings_data.data.Airings.length > 0) ) {
-                              for (var y = 0; y < airings_data.data.Airings.length; y++) {
-                                if ( airings_data.data.Airings[y].contentId == cache_data.dates[0].games[j].content.media.epg[k].items[x].contentId ) {
-                                  if ( (cache_data.dates[0].games[j].resumeDate && (cache_data.dates[0].games[j].resumeDate == airings_data.data.Airings[y].startDate)) || (cache_data.dates[0].games[j].resumedFrom && (cache_data.dates[0].games[j].gameDate == airings_data.data.Airings[y].startDate)) ) {
-                                    body += '2'
-                                  } else {
-                                    body += '1'
-                                  }
-                                  break
-                                }
-                              }
-                            }*/
+                            // otherwise, for completed games, we need to check the airings data
                           }
-                          body += ')'
+                          /*airings_data = await session.getAiringsData('', cache_data.dates[0].games[j].gamePk)
+                          if ( airings_data.data && airings_data.data.Airings && (airings_data.data.Airings.length > 0) ) {
+                            for (var y = 0; y < airings_data.data.Airings.length; y++) {
+                              if ( airings_data.data.Airings[y].contentId == cache_data.dates[0].games[j].content.media.epg[k].items[x].contentId ) {
+                                if ( (cache_data.dates[0].games[j].resumeDate && (cache_data.dates[0].games[j].resumeDate == airings_data.data.Airings[y].startDate)) || (cache_data.dates[0].games[j].resumedFrom && (cache_data.dates[0].games[j].gameDate == airings_data.data.Airings[y].startDate)) ) {
+                                  body += '2'
+                                } else {
+                                  body += '1'
+                                }
+                                break
+                              }
+                            }
+                          }*/
+
+                          streamHtml += ')'
                         }
+
+                        streamHtml +=
+                          '</span>' +
+                          '</span>'
                       }
                       // add YouTube link where available
                       /*if ( (mediaType == 'MLBTV') && cache_data.dates[0].games[j].content.media.epg[k].items[x].youtube && cache_data.dates[0].games[j].content.media.epg[k].items[x].youtube.videoId ) {
                         body += '<a' + fav_style + ' href="https://www.youtube.com/watch?v=' + cache_data.dates[0].games[j].content.media.epg[k].items[x].youtube.videoId + '" target="_blank">' + station + '&UpperRightArrow;</a>'
                       }*/
                     } else {
+                      let inactiveStation = station
+
                       if ( blackouts[gamePk] && blackouts[gamePk].blackout_feeds && blackouts[gamePk].blackout_feeds.includes(broadcast.mediaId) ) {
-                        body += '<s>' + station + '</s>'
-                      } else {
-                        body += station
+                        inactiveStation = '<span class="blackoutstation">' + station + '</span>'
                       }
-                    } // end media active check
-                    body += ', '
-                  } // end streaming available check
+
+                      streamHtml +=
+                        '<div>' +
+                        '<div class="text-left">' +
+                        streamPrefix +
+                        inactiveStation +
+                        '</div>' +
+                        '</div>'
+                    }
+                  }
                 }
               }
             }
-            if ( body.substr(-2) == ', ' ) {
-              body = body.slice(0, -2)
+
+            if (mediaType == 'MLBTV' && game_started) {
+              actionHtml +=
+                '<span class="text-right">' +
+                '<a' +
+                ' href="#" onclick="showhighlights(\'' +
+                cache_data.dates[0].games[j].gamePk +
+                '\',\'' +
+                gameDate +
+                '\'); return false;">Highlights</a>' +
+                '</span>'
             }
-            //if ( (mediaType == 'MLBTV') && (game_started) && cache_data.dates[0].games[j].content && cache_data.dates[0].games[j].content.summary && cache_data.dates[0].games[j].content.summary.hasHighlightsVideo ) {
-            if ( (mediaType == 'MLBTV') && (game_started) ) {
-              body += '<br/><a' + fav_style + ' href="#" onclick="showhighlights(\'' + cache_data.dates[0].games[j].gamePk + '\',\'' + gameDate + '\'); return false;">Highlights</a>'
+
+            if (mediaType == 'MLBTV' && abstractGameState == 'Final') {
+              actionHtml +=
+                '<span class="text-right">' +
+                '<a' +
+                ' href="#" onclick="showcondensed(\'' +
+                cache_data.dates[0].games[j].gamePk +
+                '\',\'' +
+                gameDate +
+                '\'); return false;">Condensed</a>' +
+                '</span>'
             }
           }
-          body += "</td>"
-          body += "</tr>" + "\n"
         }
+              let pitcherVis = 'is-invisible'
+              if (awayPitcher || homePitcher) { pitcherVis ='' }
+
+            body +=`
+          <div class="cardContainer flex-col" ` + fav_style + `>
+
+            <div class="cardHeader flex-between">
+              <div class="flex-start">
+                  <span class="level">` + gameLevel + `</span>
+                  <span class="tooltip">
+                    <span class="tag schedule ` + scheduleVis + `">SCD
+                      <span class="tooltiptext"> ` + scheduleDesc + `<br>` + resumeText + `</span>
+                    </span>
+                  </span>
+                  <span class="tooltip">
+                    <span class="tag gameno ` + doubleHeaderVis + `">G` + gameNo + `
+                      <span class="tooltiptext"> Game ` + gameNo + `</span>
+                    </span>
+                  </span>
+                  <span class="tooltip">
+                    <span class="tag innings ` + inningsVis + `">` + scheduledInnings + `IN
+                      <span class="tooltiptext">` + scheduledInnings + `-inning game </span>
+                    </span>
+                  </span>
+              </div>
+            <div class="flex-end">
+                <span class="tooltip">
+                  <span class="tag blackout ` + blackoutVis + `">BO
+                    <span class="tooltiptext left">` + blackoutType + 
+                      `<span class="` + blackoutToolTipVis + `"> video blackout until approx. `+ blackoutExpiry + `</span>
+                    </span>
+                  </span>
+                </span>
+                <span class="tooltip">
+                  <span class="tag freegame ` + freeGameVis + `">Free
+                    <span class="tooltiptext left">Free Game</span>
+                  </span>
+                </span>
+                <span class="tooltip">
+                  <span class="tag favorite ` + favoritVis + `">Fav
+                    <span class="tooltiptext left">Favorite team</span>
+                  </span>
+                </span>
+              <span class="time">` + state + `</span>
+              </div>
+            </div>
+
+            <div class="cardContent cardEnd">
+              <div class="game flex-center">
+                <span class="text-width text-right">` + awayDisplay + `</span>
+                <span class="divider">@</span>
+                <span class="text-width text-left">` + homeDisplay + `</span>
+              </div>
+
+                <div class="flex-center player` + pitcherVis + `">
+                  <span class="text-width text-right">` + awayPitcher + `</span>
+                  <span class="divider">vs</span>
+                  <span class="text-width text-left">` + homePitcher + `</span>
+                </div>
+            
+
+            <div class="stream flex-between">
+              <div class="text-width flex-col">` + streamHtml + `</div>
+              <div class="flex-between">
+                <span class="score">` + awayscore + `</span>
+                <span class="` + tooltipCSS + `">
+                  <span class="` + noteworthyCSS + `">` + noteworthyTag + `
+                    <span class="` + tooltipTextCSS + `">` +  noteworthyTooltip + `</span>
+                  </span>
+                </span>
+                <span class="score">` + homescore + `</span>
+              </div>
+              <div class="flex-col text-width">` + actionHtml + `</div>
+            </div>
+          </div>
+
+        </div>`
       }
     }
-    body += "</table>" + "\n"
 
-    if ( (Object.keys(blackouts).length > 0) ) {
-      body += '<span class="tooltip tinytext"><span class="blackout">strikethrough</span> indicates a live blackout or non-entitled content<span class="tooltiptext">Tap or hover over the team abbreviation to see an estimate of when the blackout will be lifted (officially ~90 minutes, but more likely ~150 minutes or ~2.5 hours after the game ends).</span></span>' + "\n"
-      if ( (Object.keys(pre_post_shows).length > 0) ) {
-        body += '<br/>'
-      }
-    }
 
-    if ( (pre_post_shows.pregame_shows && (Object.keys(pre_post_shows.pregame_shows).length > 0)) || (pre_post_shows.postgame_shows && (Object.keys(pre_post_shows.postgame_shows).length > 0)) ) {
-      body += '<span class="tooltip tinytext">/slashes/ indicates a live pre- and/or post-game show<span class="tooltiptext">A /slash before the station indicates a pre-game show; a slash/ after the station indicates a post-game show. Pre- and post-game shows are only available live.</span></span>' + "\n"
-      if ( argv.free ) {
-        body += '<br/>'
-      }
-    }
 
-    if ( argv.free ) {
-      body += '<span class="freegame tooltip tinytext">green indicates a free game<span class="tooltiptext">Free games are available to anyone with an account, no subscription necessary. Blackouts still apply.</span></span>' + "\n"
-    }
+    body += '<div class="cardContainer"><div class="cardMenuHeader">Video Options</div><div class="cardContent cardEnd">'
 
     // Rename parameter back before displaying further links
     if ( mediaType == 'MLBTV' ) {
