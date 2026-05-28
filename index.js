@@ -1951,6 +1951,24 @@ document.addEventListener("DOMContentLoaded", function () {
   </script>`
 
 
+    let entitledMASN = (entitlements.includes('MASN_110'))
+
+    let entitledMLBN = (entitlements.includes('MLBN') || entitlements.includes('EXECMLB') || entitlements.includes('MLBTVMLBNADOBEPASS'))
+
+    let entitledSNLA = (entitlements.includes('SNLA_119'))
+
+    let entitledSNY = (entitlements.includes('SNY_121'))
+
+    let entitledBigInning = ( (entitlements.length > 0) && cache_data.dates && cache_data.dates[0] && (cache_data.dates[0].date >= today) && cache_data.dates[0].games && (cache_data.dates[0].games.length > 1) && cache_data.dates[0].games[0] && (cache_data.dates[0].games[0].seriesDescription == 'Regular Season') )
+
+    let entitledChangerFinder = ((gameDate >= today) && cache_data.dates && cache_data.dates[0] && cache_data.dates[0].games && (cache_data.dates[0].games.length > 1))
+
+    let hasEntitledStreams = entitledMASN || entitledMLBN || entitledSNLA || entitledSNY || entitledBigInning || entitledChangerFinder
+       
+    let subscriptionCardVis
+    if (hasEntitledStreams) {subscriptionCardVis = ''} else {subscriptionCardVis ='is-invisible'}
+
+
     body += `<script>
         function toast() {
         var x = document.getElementById("snackbar");
@@ -1958,15 +1976,23 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
       } 
   </script>`
+    body +=`<div class="section">`
+    body += `<div class="cardContainer ${subscriptionCardVis}">
+                <div class="cardHeader flex-between">
+                  <div class="">
+                    <span class="time">Subscription streams</span>
+                  </div>
+                <div class="">
+                  <div class="info" data-target="#subscriptionInfo">?</div>
+                </div>
+              </div>
+              <div class="gameContent space-around">`
 
-    body += `<div class="cardContainer">
-              <div class="cardMenuHeader">Subscription streams</div>
-                <div class="cardContent">`
-
+    
 
     // MASN live stream for entitled subscribers
     try {
-        if ( entitlements.includes('MASN_110') ) {
+        if ( entitledMASN ) {
           body += '<div class="flex-between subscriptionStream"><span>MASN</span>'
           let querystring = '?event=MASN'
           let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
@@ -1992,7 +2018,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // MLB Network live stream for eligible USA subscribers
     try {
-        if ( entitlements.includes('MLBN') || entitlements.includes('EXECMLB') || entitlements.includes('MLBTVMLBNADOBEPASS') ) {
+        if ( entitledMLBN || entitlements.includes('EXECMLB') || entitlements.includes('MLBTVMLBNADOBEPASS') ) {
           body += '<div class="flex-between subscriptionStream"><span>MLB Network</span>'
           let querystring = '?event=MLBN'
           let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
@@ -2018,7 +2044,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // SNLA live stream for entitled subscribers
     try {
-        if ( entitlements.includes('SNLA_119') ) {
+        if ( entitledSNLA ) {
           body += '<div class="flex-between subscriptionStream"><span>SportsNet LA</span>'
           let querystring = '?event=SNLA'
           let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
@@ -2044,7 +2070,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // SNY live stream for entitled subscribers
     try {
-        if ( entitlements.includes('SNY_121') ) {
+        if ( entitledSNY ) {
           body += '<div class="flex-between subscriptionStream"><span>SNY</span>'
           let querystring = '?event=SNY'
           let multiviewquerystring = querystring + '&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION
@@ -2092,7 +2118,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Big Inning
       var big_inning
-      if ( (entitlements.length > 0) && cache_data.dates && cache_data.dates[0] && (cache_data.dates[0].date >= today) && cache_data.dates[0].games && (cache_data.dates[0].games.length > 1) && cache_data.dates[0].games[0] && (cache_data.dates[0].games[0].seriesDescription == 'Regular Season') ) {
+      if ( entitledBigInning ) {
         // Scraped Big Inning schedule
         big_inning = await session.getBigInningSchedule(gameDate)
       }
@@ -2100,7 +2126,7 @@ document.addEventListener("DOMContentLoaded", function () {
         body += '<div class="flex-between subscriptionStream">' + "\n"
         for (var i = 0; i < big_inning.length; i++) {
           if ( big_inning[i].start ) {
-            body += '<span>' + new Date(big_inning[i].start).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + new Date(big_inning[i].end).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
+            body += '<span class="tinytext">' + new Date(big_inning[i].start).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + new Date(big_inning[i].end).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
             let compareStart = new Date(big_inning[i].start)
             compareStart.setMinutes(compareStart.getMinutes()-10)
             let compareEnd = new Date(big_inning[i].end)
@@ -2131,7 +2157,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       
       // Game Changer and Stream Finder
-      if ( (gameDate >= today) && cache_data.dates && cache_data.dates[0] && cache_data.dates[0].games && (cache_data.dates[0].games.length > 1) ) {
+      if ( entitledChangerFinder ) {
         let gameIndexes = await session.get_first_and_last_games(cache_data.dates[0].games, blackouts)
         if ( (typeof gameIndexes.firstGameIndex !== 'undefined') && (typeof gameIndexes.lastGameIndex !== 'undefined') && (gameIndexes.firstGameIndex !== gameIndexes.lastGameIndex) ) {
           let compareStart = new Date(cache_data.dates[0].games[gameIndexes.firstGameIndex].gameDate)
@@ -2142,7 +2168,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           compareEnd.setHours(compareEnd.getHours()+4)
           body += '<div class="flex-between subscriptionStream">' + "\n"
-          body += '<span>' + compareStart.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + compareEnd.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
+          body += '<span class="tinytext">' + compareStart.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + compareEnd.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
           if ( (currentDate >= compareStart) && (currentDate < compareEnd) ) {
             let streamURL = server + '/gamechanger.m3u8'
             let multiviewquerystring = '/gamechanger.m3u8?resolution=' + DEFAULT_MULTIVIEW_RESOLUTION + content_protect_b
@@ -2165,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           body += '</div>' + "\n"
           body += '<div class="flex-between subscriptionStream">' + "\n"
-          body += '<span>' + compareStart.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + compareEnd.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
+          body += '<span class="tinytext">' + compareStart.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + ' - ' + compareEnd.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '</span>'
           if ( (currentDate >= compareStart) && (currentDate < compareEnd) ) {
             let streamURL = server + '/gamechanger.m3u8?streamFinder=on'
             let multiviewquerystring = '/gamechanger.m3u8?streamFinder=on&resolution=' + DEFAULT_MULTIVIEW_RESOLUTION + content_protect_b
@@ -2190,37 +2216,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
     }
-    body += '</div>'
-
-  let SubscriptionStreamsVis = 'is-invisible'
-  if (gameDate == today) {SubscriptionStreamsVis = ''}
-
-      body += `
-      <div class="cardInfoLine ` + SubscriptionStreamsVis + `">Subscription information</div>
-      <div class="infoContainer">
-        <div class="infoContent">
-          <b>MLB Network</b><p>MLB Network live stream is now available in the USA for paid MLBTV subscribers or as a paid add-on, in addition to authenticated TV subscribers. <a href="https://support.mlb.com/s/article/MLB-Network-Streaming-FAQ">See here for more information</a>.</p>
-          <b>Big Inning</b><p>Big Inning is the live look-in and highlights show. <a href="https://support.mlb.com/s/article/What-Is-MLB-Big-Inning">See here for more information</a>.</p>
-          <b>Game Changer</b><p>The game changer stream will automatically switch between the highest leverage active live non-blackout games, and should be available whenever there are such games available. Does not support adaptive bitrate switching, will default to 720p60 resolution if not specified.</p>
-          <b>Stream Finder</b><p>The stream finder stream will automatically switch between games according to your uploaded preferences. This stream is not affiliated with Baseball Reference, do not contact them for support. Visit <a href="http://bit.ly/bbrefsf">http://bit.ly/bbrefsf</a> to create and export your preferences, then upload and save them to mlbserver <a href="#streamfinder">below</a>. Does not support adaptive bitrate switching, will default to 720p60 resolution if not specified.</p>
-          <b>MASN Live & SNLA Live & SNY Live</b><p>Live stream for entitled subscribers.<br>For more information visit: 
-          <a href="https://support.mlb.com/s/article/MASN-In-Market-Offering">MASN</a>      
-          <a href="https://support.mlb.com/s/article/SNLA-Plus-Subscription-Packages">SNLA</a>      
-          <a href="https://support.mlb.com/s/article/SNY-In-Market-Offering"">SNY</a>
-        </div>
-      </div>
-
-      <div class="cardInfoLine cardEnd">Blackouts, shows & free games</div>
-      <div class="infoContainer">
-        <div class="infoContent">
-          <b>Blackouts</b><p>A blackout game is either a live blackout or non-entitled content. Tap or hover over the blackout icon to see an estimate of when the blackout will be lifted (officially ~90 minutes, but more likely ~150 minutes or ~2.5 hours after the game ends).</p>
-          <b>Pre-/Postgame show</b><p>/slashes/ indicates a live pre- and/or post-game show. A /slash before the station indicates a pre-game show; a slash/ after the station indicates a post-game show. Pre- and post-game shows are only available live.</p>
-          <b>Free games</b><p>Free games are available to anyone with an account, no subscription necessary. Blackouts still apply.</p>
-        </div>
-      </div>
-    </div>`
-
-
+    body += `</div></div>`
 
     if ( cache_data.dates && cache_data.dates[0] && cache_data.dates[0].games ) {
       for (var j = 0; j < cache_data.dates[0].games.length; j++) {
