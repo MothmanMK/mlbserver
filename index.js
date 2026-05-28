@@ -2383,6 +2383,9 @@ document.addEventListener("DOMContentLoaded", function () {
         let gameNo = ''
         let resumeText = ''
 
+        let highlightLink = ''
+        let condensedLink = ''
+
         if ( cache_data.dates[0].games[j].doubleHeader != 'N'  ) {
           gameNo = cache_data.dates[0].games[j].gameNumber
           doubleHeaderVis = ''
@@ -2744,28 +2747,27 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (mediaType == 'MLBTV' && game_started) {
-              actionHtml +=
-                '<span class="text-right">' +
+              highlightLink +=
                 '<a' +
                 ' href="#" onclick="showhighlights(\'' +
                 cache_data.dates[0].games[j].gamePk +
                 '\',\'' +
                 gameDate +
-                '\'); return false;">Highlights</a>' +
-                '</span>'
-            }
+                '\'); return false;">Highlights</a>'
+            } else { highlightLink += `Highlights`
+              highlightCSS = 'videosInactive'
+             }
 
-            if (mediaType == 'MLBTV' && abstractGameState == 'Final') {
-              actionHtml +=
-                '<span class="text-right">' +
+            if (mediaType == 'MLBTV' && abstractGameState == 'Final' && (detailedState != 'Postponed') ) {
+              condensedLink +=
                 '<a' +
                 ' href="#" onclick="showcondensed(\'' +
                 cache_data.dates[0].games[j].gamePk +
                 '\',\'' +
                 gameDate +
-                '\'); return false;">Condensed</a>' +
-                '</span>'
-            }
+                '\'); return false;">Condensed</a>'
+            } else { condensedLink += `Condensed` 
+                     condensedCSS = 'videosInactive'}
           }
         }
               let pitcherVis = 'is-invisible'
@@ -2815,34 +2817,17 @@ document.addEventListener("DOMContentLoaded", function () {
               </div>
             </div>
 
-            <div class="cardContent cardEnd">
-              <div class="game flex-center">
-                <span class="text-width text-right">` + awayDisplay + `</span>
-                <span class="divider">@</span>
-                <span class="text-width text-left">` + homeDisplay + `</span>
-              </div>
-
-                <div class="flex-center player` + pitcherVis + `">
-                  <span class="text-width text-right">` + awayPitcher + `</span>
-                  <span class="divider">vs</span>
-                  <span class="text-width text-left">` + homePitcher + `</span>
-                </div>
-            
-
-            <div class="stream flex-between">
-              <div class="text-width flex-col">` + streamHtml + `</div>
-              <div class="flex-between">
-                <span class="score">` + awayscore + `</span>
-                <span class="` + tooltipCSS + `">
-                  <span class="` + noteworthyCSS + `">` + noteworthyTag + `
-                    <span class="` + tooltipTextCSS + `">` +  noteworthyTooltip + `</span>
-                  </span>
-                </span>
-                <span class="score">` + homescore + `</span>
-              </div>
-              <div class="flex-col text-width">` + actionHtml + `</div>
-            </div>
           </div>
+          <div class="streamContent">
+                <span class="">${streamSource.awayTV}</span>
+                <span class="flex-center ${highlightCSS}">★ ${highlightLink}</span>
+          </div>
+
+          <div class="streamContent">
+            <span class="">${streamSource.homeTV}</span>
+            <span class="flex-center ${condensedCSS}">◆ ${condensedLink}</span>
+          </div>
+      
 
         </div>`
       }
@@ -3294,13 +3279,15 @@ span.onclick = closeModal;`
         if (captions == 'disabled') {
           captions_parameter = '&captions=disabled';
         }
+        var condensedExists = null;
+        var hls_url = '';
+        var mp4_url = '';
         if (highlights && (highlights.length > 0)) {
 
           for (var i = 0; i < highlights.length; i++) {
 
             if (highlights[i].headline && highlights[i].headline.indexOf("Condensed Game") !== -1) {
-              var hls_url = '';
-              var mp4_url = '';
+              condensedExists = highlights[i];
               for (var j = 0; j < highlights[i].playbacks.length; j++) {
                 if (highlights[i].playbacks[j].name && (highlights[i].playbacks[j].name == 'HTTP_CLOUD_WIRED_60')) {
                   hls_url = highlights[i].playbacks[j].url;
@@ -3311,8 +3298,10 @@ span.onclick = closeModal;`
               break;
             }
           }
-            
-            if (highlights[i] =! '') { window.location.href = "` + link + `?highlight_src=" + encodeURIComponent(hls_url) + "&resolution=" + resolution + captions_parameter + "` + content_protect_b + `"; }
+            if (!condensedExists || !hls_url) {
+      toast();
+      return;
+    } { window.location.href = "` + link + `?highlight_src=" + encodeURIComponent(hls_url) + "&resolution=" + resolution + captions_parameter + "` + content_protect_b + `"; }
 
 
         }
@@ -3328,7 +3317,7 @@ span.onclick = closeModal;`
     }
 
         </script>`
-
+body +=`</div>`
     body += '<div id="snackbar">Not yet available. Come back later.</div>'
 
     body += "</body></html>"
