@@ -1868,7 +1868,7 @@ app.get('/', async function(req, res) {
     var mediaFeedType = 'mediaFeedType'
     var language = 'en'
     if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-      mediaType = 'MLBTV'
+      mediaTypeTV = 'MLBTV'
     } else if ( mediaType == VALID_MEDIA_TYPES[2] ) {
       //mediaType = VALID_MEDIA_TYPES[1]
       language = 'es'
@@ -2101,7 +2101,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
-    if ( (mediaType == 'MLBTV') && ((level_ids == levels['MLB']) || level_ids.startsWith(levels['MLB'] + ',')) ) {
+    if ( (mediaTypeTV == 'MLBTV') && ((level_ids == levels['MLB']) || level_ids.startsWith(levels['MLB'] + ',')) ) {
       // Recap Rundown beginning in 2023, disabled because it stopped working
       /*if ( (gameDate <= yesterday) && (gameDate >= '2023-03-31') && cache_data.dates && cache_data.dates[0] && cache_data.dates[0].games && (cache_data.dates[0].games.length > 0) ) {
         body += '<tr><td><span class="tooltip">VOD<span class="tooltiptext">Recap Rundown plays all of a day\'s recaps in order.</span></span></td><td>'
@@ -2480,14 +2480,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Check if Winter League / MiLB game first
-        if ( (cache_data.dates[0].games[j].teams['away'].team.sport.id != levels['MLB']) && (cache_data.dates[0].games[j].teams['home'].team.sport.id != levels['MLB']) && (mediaType == 'MLBTV') ) {
+        if ( (cache_data.dates[0].games[j].teams['away'].team.sport.id != levels['MLB']) && (cache_data.dates[0].games[j].teams['home'].team.sport.id != levels['MLB']) && (mediaTypeTV == 'MLBTV') ) {
           condensedCSS = 'is-invisible'
           highlightCSS = 'is-invisible'
           if ( cache_data.dates[0].games[j].broadcasts ) {
             let broadcastName = 'N/A'
             for (var k = 0; k < cache_data.dates[0].games[j].broadcasts.length; k++) {
               if ( cache_data.dates[0].games[j].broadcasts[k].name != 'Audio' ) {
-                broadcastName = mediaType
+                broadcastName = mediaTypeTV
                 break
               }
             }
@@ -2574,9 +2574,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 } else if ( broadcast.language == 'es' ) {
                   mediaTitle = 'Spanish'
                 }
-                if ( mediaTitle == mediaType ) {
+                if ( mediaTitle == mediaTypeTV ) {
                 // for video, check that it's not in-market
-                /*if ( (mediaType == 'MLBTV') && await session.check_in_market(cache_data.dates[0].games[j].content.media.epg[k].items[x]) ) {
+                /*if ( (mediaTypeTV == 'MLBTV') && await session.check_in_market(cache_data.dates[0].games[j].content.media.epg[k].items[x]) ) {
                   continue
                 }*/
 
@@ -2621,7 +2621,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         game_started = true
                       }
                       let mediaId = broadcast.mediaId
-                         if ( (mediaType == 'MLBTV') && (gameDate == today) && session.cache.media && session.cache.media[mediaId] && session.cache.media[mediaId].blackout && session.cache.media[mediaId].blackoutExpiry && (new Date(session.cache.media[mediaId].blackoutExpiry) > new Date()) ) {
+                         if ( (mediaTypeTV == 'MLBTV') && (gameDate == today) && session.cache.media && session.cache.media[mediaId] && session.cache.media[mediaId].blackout && session.cache.media[mediaId].blackoutExpiry && (new Date(session.cache.media[mediaId].blackoutExpiry) > new Date()) ) {
                         streamSource.awayTV +=
                           streamPrefix +
                           '<span class="blackoutstation">' + station + '</span>'
@@ -2642,7 +2642,7 @@ document.addEventListener("DOMContentLoaded", function () {
                           if ( startFrom != VALID_START_FROM[0] ) querystring += '&startFrom=' + startFrom
                           if ( controls != VALID_CONTROLS[0] ) querystring += '&controls=' + controls
                         }
-                        if ( mediaType == 'MLBTV' ) {
+                        if ( mediaTypeTV == 'MLBTV' ) {
                           if ( inning_half != VALID_INNING_HALF[0] ) querystring += '&inning_half=' + inning_half
                           if ( inning_number != VALID_INNING_NUMBER[0] ) querystring += '&inning_number=' + relative_inning
                           if ( skip != VALID_SKIP[0] ) querystring += '&skip=' + skip
@@ -2675,7 +2675,7 @@ document.addEventListener("DOMContentLoaded", function () {
                       if (broadcast.homeAway == 'home') {
                         streamSource.homeTV += '<span>'
 
-                        if ( mediaType == 'MLBTV' ) {
+                        if ( mediaTypeTV == 'MLBTV' ) {
                           streamSource.homeTV +=
                             '<input type="checkbox" value="http://127.0.0.1:' +
                             session.data.port +
@@ -2728,7 +2728,7 @@ document.addEventListener("DOMContentLoaded", function () {
                       } else if (broadcast.homeAway == 'away') {
                         streamSource.awayTV += '<span>'
 
-                        if ( mediaType == 'MLBTV' ) {
+                        if ( mediaTypeTV == 'MLBTV' ) {
                           streamSource.awayTV +=
                             '<input type="checkbox" value="http://127.0.0.1:' +
                             session.data.port +
@@ -2781,7 +2781,7 @@ document.addEventListener("DOMContentLoaded", function () {
                       }
                       }
                       // add YouTube link where available
-                      /*if ( (mediaType == 'MLBTV') && cache_data.dates[0].games[j].content.media.epg[k].items[x].youtube && cache_data.dates[0].games[j].content.media.epg[k].items[x].youtube.videoId ) {
+                      /*if ( (mediaTypeTV == 'MLBTV') && cache_data.dates[0].games[j].content.media.epg[k].items[x].youtube && cache_data.dates[0].games[j].content.media.epg[k].items[x].youtube.videoId ) {
                         body += '<a' + fav_style + ' href="https://www.youtube.com/watch?v=' + cache_data.dates[0].games[j].content.media.epg[k].items[x].youtube.videoId + '" target="_blank">' + station + '&UpperRightArrow;</a>'
                       }*/
                     } else {
@@ -2810,7 +2810,7 @@ document.addEventListener("DOMContentLoaded", function () {
               }
             }
 
-            if (mediaType == 'MLBTV' && game_started) {
+            if (mediaTypeTV == 'MLBTV' && game_started) {
               highlightLink +=
                 '<a' +
                 ' href="#" onclick="showhighlights(\'' +
@@ -2822,7 +2822,7 @@ document.addEventListener("DOMContentLoaded", function () {
               highlightCSS = 'videosInactive'
              }
 
-            if (mediaType == 'MLBTV' && abstractGameState == 'Final' && (detailedState != 'Postponed') ) {
+            if (mediaTypeTV == 'MLBTV' && abstractGameState == 'Final' && (detailedState != 'Postponed') ) {
               condensedLink +=
                 '<a' +
                 ' href="#" onclick="showcondensed(\'' +
