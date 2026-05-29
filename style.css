@@ -34,7 +34,7 @@ body {
 }
 
 h1 {
-    margin: 0;;
+    margin: 0;
     color: goldenrod;
 }
 
@@ -132,15 +132,21 @@ h1 {
 
 .infoContainer {
     font-size: small;
-    background-color: #151d24;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
 }
 
 .infoContent {
-    padding: 0 15px 0 15px;
-    width: 40vw;
+    margin: 10px 0 12px 0;
+    padding: 12px 14px 12px 14px;
+    background: #22262d;
+    border: 1px solid #3a4654;
+    border-left: 4px solid #d6aa34;
+    border-radius: 8px;
+    color: #d7d9dc;
+    font-size: 0.92rem;
+    line-height: 1.45;
 }
 
 .infoContainer .infoContent {
@@ -214,7 +220,7 @@ h1 {
 }
 
 .infoPadding {
-    margin-right: 5px;
+    margin: 0 5px 0 5px;
 }
 
 .subscriptionStream {
@@ -425,13 +431,16 @@ button.default {
 .closingLine {
     display: flex;
     justify-content: center;
-    padding-bottom: 15px;
+    padding-top: 15px;
 }
 
 textarea {
     width: 70%;
     height: 2rem;
     margin: 2px;
+    background-color: #0e0e0e;
+    color: LightGray;
+    border: 1px solid darkgray;
 }
 
 .option {
