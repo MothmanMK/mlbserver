@@ -1907,8 +1907,8 @@ app.get('/', async function(req, res) {
  body += `
     <div class="section">
       <div id="subscriptionInfo" class="infoContainer">
-      <div class="is-flex">
-          <div class="infoContent">
+        <div class="infoContent">
+          <div style="column-count:2;column-gap:24px;">
             <b>MLB Network</b><p>MLB Network live stream is now available in the USA for paid MLBTV subscribers or as a paid add-on, in addition to authenticated TV subscribers. <a href="https://support.mlb.com/s/article/MLB-Network-Streaming-FAQ">See here for more information</a>.</p>
 
             <b>Big Inning</b><p>Big Inning is the live look-in and highlights show. <a href="https://support.mlb.com/s/article/What-Is-MLB-Big-Inning">See here for more information</a>.</p>
@@ -1916,15 +1916,13 @@ app.get('/', async function(req, res) {
             <b>MASN Live & SNLA Live & SNY Live</b><p>Live stream for entitled subscribers.<br>For more information visit: 
             <a href="https://support.mlb.com/s/article/MASN-In-Market-Offering">MASN</a>      
             <a href="https://support.mlb.com/s/article/SNLA-Plus-Subscription-Packages">SNLA</a>      
-            <a href="https://support.mlb.com/s/article/SNY-In-Market-Offering"">SNY</a></p>
-          </div>
-          <div class="infoContent">
+            <a href="https://support.mlb.com/s/article/SNY-In-Market-Offering">SNY</a></p>
+
             <b>Game Changer</b><p>The game changer stream will automatically switch between the highest leverage active live non-blackout games, and should be available whenever there are such games available. Does not support adaptive bitrate switching, will default to 720p60 resolution if not specified.</p>
 
             <b>Stream Finder</b><p>The stream finder stream will automatically switch between games according to your uploaded preferences. This stream is not affiliated with Baseball Reference, do not contact them for support. Visit <a href="http://bit.ly/bbrefsf">http://bit.ly/bbrefsf</a> to create and export your preferences, then upload and save them to mlbserver <a href="#streamfinder">below</a>. Does not support adaptive bitrate switching, will default to 720p60 resolution if not specified.</p>
           </div>
-          </div>
-           </div>
+        </div>
       </div>
     </div>`
 
