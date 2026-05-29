@@ -1837,6 +1837,73 @@ app.get('/', async function(req, res) {
 
     body += '</div></div></div>'
 
+
+       body += '<div class="section"><div class="menuContainer"><div class="cardMenuHeader">Video Options</div><div class="menuContent">'
+
+    if ( mediaType == VALID_MEDIA_TYPES[0] ) {
+        body += '<span class="tooltip">Video<span class="tooltiptext">For video streams only: you can manually specifiy a video track (resolution) to use. Adaptive will let your client choose. Best will select either 1080p60 (MLB) or 720p60 (MiLB). 504p is default for multiview (see below).<br/><br/>None will allow to remove the video tracks, if you just want to listen to the audio while using the "start at inning" or "skip breaks" options enabled.</span></span>: '
+        body += '<button '
+        if ( resolution == 'best' ) body += 'class="default" '
+        body += 'onclick="resolution=\'best\';reload()">best</button> '
+        for (var i = 0; i < VALID_RESOLUTIONS.length; i++) {
+          body += '<button '
+          if ( resolution == VALID_RESOLUTIONS[i] ) body += 'class="default" '
+          body += 'onclick="resolution=\'' + VALID_RESOLUTIONS[i] + '\';reload()">' + VALID_RESOLUTIONS[i]
+          if ( DISPLAY_BANDWIDTHS[i] != '' ) {
+            body += '<br/><span>' + DISPLAY_BANDWIDTHS[i] + '</span>'
+          }
+          body += '</button> '
+        }
+
+        body += '<p><span class="tooltip">Audio<span class="tooltiptext">For video streams only: you can manually specifiy which audio track to include. Some media players can accept them all and let you choose. Not all tracks are available for all games, and injected tracks may not work with skip options below.<br/><br/>If you select "none" for video above, picking an audio track here will make it an audio-only feed that supports the inning start and skip breaks options.</span></span>: '
+        for (var i = 0; i < VALID_AUDIO_TRACKS.length; i++) {
+          body += '<button '
+          if ( audio_track == VALID_AUDIO_TRACKS[i] ) body += 'class="default" '
+          body += 'onclick="audio_track=\'' + VALID_AUDIO_TRACKS[i] + '\';reload()">' + DISPLAY_AUDIO_TRACKS[i] + '</button> '
+        }
+        body += '</p>' + "\n"
+
+        body += '<p><span class="tooltip">Captions<span class="tooltiptext">For video streams only: you can disable the caption track, if one is present. This is handy if you do not want to disable it in your player each time.</span></span>: '
+        for (var i = 0; i < VALID_CAPTIONS.length; i++) {
+          body += '<button '
+          if ( captions == VALID_CAPTIONS[i] ) body += 'class="default" '
+          body += 'onclick="captions=\'' + VALID_CAPTIONS[i] + '\';reload()">' + VALID_CAPTIONS[i] + '</button> '
+        }
+        body += '</p>' + "\n"
+
+        body += '<p><span class="tooltip">Skip<span class="tooltiptext">For video streams only (use the video "none" option above to apply it to audio streams): you can remove all breaks, idle time, non-action pitches, or only commercial breaks from the stream (useful to make your own "condensed games").<br/><br/>NOTES: skip timings are only generated when the stream is loaded -- so for live games, it will only skip up to the time you loaded the stream. Also, commercial skip will not work on pre-2024 games, or on MiLB games -- use skip breaks instead.</span></span>: '
+        for (var i = 0; i < VALID_SKIP.length; i++) {
+          body += '<button '
+          if ( skip == VALID_SKIP[i] ) body += 'class="default" '
+          body += 'onclick="skip=\'' + VALID_SKIP[i] + '\';reload()">' + VALID_SKIP[i] + '</button> '
+        }
+        if ( skip != VALID_SKIP[0] ) {
+          body += '<br><span class="tooltip">Skip Adjust<span class="tooltiptext">Seconds to adjust the skip time video segments, if necessary. Try a negative number if the plays are ending before the video segments begin; use a positive number if the video segments are ending before the play happens.</span></span>: <input type="number" id="skip_adjust" value="' + skip_adjust + '" step="1" onchange="setTimeout(function(){skip_adjust=document.getElementById(\'skip_adjust\').value;reload()},750)" onblur="skip_adjust=this.value;reload()" style="vertical-align:top;font-size:.8em;width:3em"/>'
+        }
+        body += '</p>' + "\n"
+      }
+
+      body += '<p><span class="tooltip">Pad<span class="tooltiptext">You can pad archive streams with random extra time at the end, to help conceal timeline spoilers.</span></span>: '
+      for (var i = 0; i < VALID_PAD.length; i++) {
+        body += '<button '
+        if ( pad == VALID_PAD[i] ) body += 'class="default" '
+        body += 'onclick="pad=\'' + VALID_PAD[i] + '\';reload()">' + VALID_PAD[i] + '</button> '
+      }
+      body += '</p>' + "\n"
+
+      if ( (linkType == VALID_LINK_TYPES[1]) && (gameDate == today) ) {
+        body += '<p><span class="tooltip">Force VOD<span class="tooltiptext">For streams only: if your client does not support seeking in mlbserver live streams, turning this on will make the stream look like a VOD stream instead, allowing the client to start at the beginning and allowing the user to seek within it. You will need to reload the stream to watch/view past the current time, though.</span></span>: '
+        for (var i = 0; i < VALID_FORCE_VOD.length; i++) {
+          body += '<button '
+          if ( force_vod == VALID_FORCE_VOD[i] ) body += 'class="default" '
+          body += 'onclick="force_vod=\'' + VALID_FORCE_VOD[i] + '\';reload()">' + VALID_FORCE_VOD[i] + '</button> '
+        }
+        body += '<span>(if client does not support seeking in live streams)</span></p>' + "\n"
+      }
+
+      body += '</div></div>' 
+    body += '</div>' 
+
  body += `
     <div class="section">
       <div id="subscriptionInfo" class="infoContainer">
