@@ -3141,7 +3141,36 @@ body += `
         </div></div>
         `
     
-        body += '<div class="menuContainer"><div class="cardMenuHeader">Stream finder settings</div><div class="menuContent"><a download="mlbserverStreamFinder.txt" href="' + http_root + '/downloadsettings' + content_protect_a + '">Click to Download Currently Stored Settings</a></p><b>Step 1</b><br/>Export and download your desired Stream Finder settings at this link:<br/><a href="https://www.baseball-reference.com/stream-finder.shtml" target="_blank">https://www.baseball-reference.com/stream-finder.shtml</a><form method="POST" enctype="multipart/form-data" action="' + http_root + '/upload' + content_protect_a + '"><br><b>Step 2</b><br/>Click this button and select the settings file you just downloaded:<br/><input name="file" type="file" onchange="form.submit()"/></form><br>Automatically switches between games according to your preferences. This program is not affiliated with Baseball Reference, do not contact them for support.</div></div>' + "\n"
+        body += `
+          <div class="menuContainer">
+            <div class="cardMenuHeader">Stream Finder Settings</div>
+            <div class="menuContent streamFinderContent">
+              <div>
+                <a class="channelLink" download="mlbserverStreamFinder.txt" href="${http_root}/downloadsettings${content_protect_a}">Download current settings</a>
+              </div>
+              <div class="streamFinderSteps">
+                <div class="streamFinderStep">
+                  <div class="streamFinderStepNumber">1</div>
+                  <div class="streamFinderStepContent">
+                    <div class="streamFinderStepTitle">Export settings</div>
+                    <div class="streamFinderStepText">Create and export your Stream Finder settings at Baseball Reference.</div>
+                    <a class="channelLink" href="https://www.baseball-reference.com/stream-finder.shtml" target="_blank">Open Stream Finder</a>
+                  </div>
+                </div>
+                <div class="streamFinderStep">
+                  <div class="streamFinderStepNumber">2</div>
+                  <div class="streamFinderStepContent">
+                    <div class="streamFinderStepTitle">Upload settings</div>
+                    <div class="streamFinderStepText">Select the settings file you just downloaded.</div>
+                    <form method="POST" enctype="multipart/form-data" action="${http_root}/upload${content_protect_a}">
+                      <input name="file" type="file" onchange="form.submit()"/>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="streamFinderNote">Automatically switches between games according to your preferences. This program is not affiliated with Baseball Reference, do not contact them for support.</div>
+            </div>
+          </div>` + "\n"
     }
 body +=`</div>`
     const channelInfoText = {
