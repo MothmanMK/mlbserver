@@ -1655,6 +1655,7 @@ app.get('/', async function(req, res) {
     if ( req.query.mediaType ) {
       mediaType = req.query.mediaType
     }
+    var mediaTypeTV = mediaType
     var resolution = VALID_RESOLUTIONS[0]
     if ( req.query.resolution ) {
       resolution = req.query.resolution
