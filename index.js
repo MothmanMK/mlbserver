@@ -3043,15 +3043,15 @@ body +=`<div class="section">`
  
 
       if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-        body += '<div class="menuContainer"><div class="cardMenuHeader"> Multiview / Alternate Audio / Sync</div><div class="menuContent">' + 
-         '<div class="is-flex"><div class="info infoPadding" data-target="#multiviewInfo">?</div>Multiview / Alternate Audio / Sync: <a id="startmultiview" href="" onclick="startmultiview(this);return false">Start'
+        body += '<div class="menuContainer"><div class="cardMenuHeader">Multiview / Alternate Audio / Sync</div><div class="menuContent multiviewContent">' +
+         '<div class="multiviewHeader"><div class="is-flex"><span>Multiview / Alternate Audio / Sync</span><div class="info infoPadding" data-target="#multiviewInfo">?</div></div><div class="multiviewActions"><a id="startmultiview" class="multiviewAction multiviewActionPrimary" href="" onclick="startmultiview(this);return false">Start'
         if ( ffmpeg_status ) body += 'ed'
-        body += '</a> | <a id="stopmultiview" href="" onclick="stopmultiview(this);return false">Stop'
+        body += '</a><a id="stopmultiview" class="multiviewAction" href="" onclick="stopmultiview(this);return false">Stop'
         if ( !ffmpeg_status ) body += 'ped'
-        body += '</a><br/></div>' + "\n" +
-        '<div style="display: flex; gap: 10px;"><div class="square-grid"><div>1</div><div>2</div><div>3</div><div>4</div></div>' 
+        body += '</a></div></div>' + "\n" +
+        '<div class="multiviewIntro"><div class="square-grid"><div>1</div><div>2</div><div>3</div><div>4</div></div>'
        
-        body +=  '<span>(check boxes next to games to add, then click "Start"; must click "Stop" link above when done, or manually kill ffmpeg)</span></div>' + ''
+        body +=  '<span>Check boxes next to games to add, then click Start. Click Stop when done, or manually kill ffmpeg.</span></div>' + ''
 body += `
          <div id="multiviewInfo" class="infoContainer">
         <div class="">
@@ -3064,9 +3064,8 @@ body += `
       `
 
         for (var i=1; i<=4; i++) {
-          body += i + ': <textarea id="multiview' + i + '" oninput="this.value=stream_substitution(this.value)"></textarea>'
-          body += '<input type="number" id="sync' + i + '" value="0.0" step=".1" style="vertical-align:top;font-size:.8em;width:3em"/>'
-          body += '<br/>' + "\n"
+          body += '<div class="multiviewStreamRow"><label for="multiview' + i + '">' + i + ':</label><textarea id="multiview' + i + '" oninput="this.value=stream_substitution(this.value)"></textarea>'
+          body += '<input type="number" id="sync' + i + '" value="0.0" step=".1"/></div>' + "\n"
         }
         body += `
           <div class="is-flex">
@@ -3114,30 +3113,31 @@ body += `
           </div>`
 
         body += `
-          <hr>
           <div class="is-flex">
-            <div class="info infoPadding" data-target="#altAudio">?</div>
             <span>Alternate audio URL and sync</span>
+            <div class="info infoPadding" data-target="#altAudio">?</div>
           </div>
           <div id="altAudio" class="infoContainer">
             <div class="infoContent">
               Optional: you can also include a separate audio-only URL as an additional alternate audio track. Archive games will likely require a very large negative sync value, as the radio broadcasts may not be trimmed like the video archives.
             </div>
           </div>
-          <textarea id="audio_url" oninput="this.value=stream_substitution(this.value)"></textarea>
-          <input id="audio_url_seek" type="number" value="0" style="vertical-align:top;font-size:.8em;width:4em"/>
-          <hr>
-          Watch:
-          <a href="${http_root}/embed.html?msrc=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Embed</a> |
-          <a href="${http_root}/stream.m3u8?src=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Stream</a> |
-          <a href="${http_root}/chromecast.html?msrc=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Chromecast</a> |
-          <a href="${http_root}/advanced.html?msrc=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Advanced</a> |
-          <a href="${http_root}/download.ts?src=${encodeURIComponent(multiview_stream_url)}${content_protect_b}&filename=${gameDate} Multiview">Download</a><br/>
-          <span>
-            Kodi STRM files:
-            <a href="${http_root}/kodi.strm?src=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Matrix/19+</a>
-            (<a href="${http_root}/kodi.strm?version=18&src=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Leia/18</a>)
-          </span>
+          <div class="multiviewAudioRow">
+            <textarea id="audio_url" oninput="this.value=stream_substitution(this.value)"></textarea>
+            <input id="audio_url_seek" type="number" value="0"/>
+          </div>
+          <div class="multiviewWatchLinks">
+            <a class="channelLink" href="${http_root}/embed.html?msrc=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Embed</a>
+            <a class="channelLink" href="${http_root}/stream.m3u8?src=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Stream</a>
+            <a class="channelLink" href="${http_root}/chromecast.html?msrc=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Chromecast</a>
+            <a class="channelLink" href="${http_root}/advanced.html?msrc=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Advanced</a>
+            <a class="channelLink" href="${http_root}/download.ts?src=${encodeURIComponent(multiview_stream_url)}${content_protect_b}&filename=${gameDate} Multiview">Download</a>
+          </div>
+          <div class="multiviewWatchLinks">
+            <span class="channelNote">Kodi STRM files:</span>
+            <a class="channelLink" href="${http_root}/kodi.strm?src=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Matrix/19+</a>
+            <a class="channelLink" href="${http_root}/kodi.strm?version=18&src=${encodeURIComponent(multiview_stream_url)}${content_protect_b}">Leia/18</a>
+          </div>
         </div></div>
         `
     

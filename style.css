@@ -344,6 +344,121 @@ h1 {
     margin-top: 8px;
 }
 
+.multiviewContent {
+    display: grid;
+    gap: 10px;
+}
+
+.multiviewHeader {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px 16px;
+}
+
+.multiviewActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.multiviewAction {
+    border: 1px solid var(--color-pill-accent-border);
+    border-radius: 4px;
+    color: var(--color-accent);
+    font-size: 0.86rem;
+    font-weight: bold;
+    min-width: 5.5rem;
+    padding: 4px 10px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.multiviewActionPrimary {
+    background: var(--color-pill-accent-bg);
+}
+
+#stopmultiview {
+    border-color: var(--color-info-border);
+    color: var(--color-text-muted);
+}
+
+.multiviewAction:hover,
+.multiviewAction:focus {
+    background: var(--color-pill-accent-bg-hover);
+    color: var(--color-accent-hover);
+}
+
+#stopmultiview:hover,
+#stopmultiview:focus {
+    border-color: var(--color-pill-accent-border);
+}
+
+.multiviewIntro {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+}
+
+.multiviewStreamRow {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr) 4rem;
+    gap: 6px;
+    align-items: center;
+}
+
+.multiviewStreamRow label {
+    color: var(--color-text-strong);
+    font-size: 0.86rem;
+    font-weight: bold;
+}
+
+.multiviewStreamRow textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.multiviewStreamRow input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.8em;
+}
+
+.multiviewSectionTitle {
+    color: var(--color-accent);
+    font-size: 0.78rem;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.multiviewAudioRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 4rem;
+    gap: 6px;
+    align-items: center;
+}
+
+.multiviewAudioRow textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.multiviewAudioRow input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.8em;
+}
+
+.multiviewWatchLinks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
 .infoContainer {
     font-size: small;
     max-height: 0;
