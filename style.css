@@ -17,6 +17,18 @@
     --color-pill-accent-bg: rgba(218, 165, 32, 0.08);
     --color-pill-accent-bg-hover: rgba(218, 165, 32, 0.14);
     --color-pill-accent-border: rgba(218, 165, 32, 0.6);
+    --level-mlb: #d6aa34;
+    --level-mlb-bg: rgba(214, 170, 52, 0.1);
+    --level-aaa: #58a6ff;
+    --level-aaa-bg: rgba(88, 166, 255, 0.12);
+    --level-aa: #c084fc;
+    --level-aa-bg: rgba(192, 132, 252, 0.12);
+    --level-a-plus: #2dd4bf;
+    --level-a-plus-bg: rgba(45, 212, 191, 0.12);
+    --level-a: #86efac;
+    --level-a-bg: rgba(134, 239, 172, 0.12);
+    --level-winter: #fb923c;
+    --level-winter-bg: rgba(251, 146, 60, 0.12);
 }
 
 html,
@@ -115,6 +127,15 @@ h1 {
     border-left: 2px solid var(--color-accent)
 }
 
+.cardContainer.level-mlb,
+.cardContainer.level-aaa,
+.cardContainer.level-aa,
+.cardContainer.level-a,
+.cardContainer.level-a-plus,
+.cardContainer.level-winter {
+    border-left: 2px solid var(--level-color) !important;
+}
+
 .menuContainer {
     background-color: var(--color-panel);
     display: grid;
@@ -129,6 +150,7 @@ h1 {
     font-size: 0.78rem;
     padding: 2px 0;
     color: var(--color-accent);
+    align-items: center;
 }
 
 .cardMenuHeader {
@@ -393,6 +415,8 @@ h1 {
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    min-height: 1rem;
+    line-height: 1;
     white-space: nowrap;
     color: var(--color-text);
 }
@@ -440,6 +464,14 @@ h1 {
 .flex-center {
     display: flex;
     justify-content: center;
+}
+
+.cardTags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
 }
 
 .row {
@@ -518,11 +550,15 @@ h1 {
 }
 
 .tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     min-width: 30px;
+    min-height: 1rem;
     border-radius: 5px;
     font-size: 0.7rem;
-    margin: 0 4px;
+    line-height: 1;
     padding: 0 2px;
 }
 
@@ -531,9 +567,39 @@ span.innings {
 }
 
 .level {
-    color: var(--color-accent);
-    background-color: rgba(218, 165, 32, 0.1);
-    border: 1px solid rgb(218, 165, 32);
+    color: var(--level-color, var(--color-accent));
+    background-color: var(--level-bg, var(--color-pill-accent-bg));
+    border: 1px solid var(--level-color, var(--color-accent));
+}
+
+.level-mlb {
+    --level-color: var(--level-mlb);
+    --level-bg: var(--level-mlb-bg);
+}
+
+.level-aaa {
+    --level-color: var(--level-aaa);
+    --level-bg: var(--level-aaa-bg);
+}
+
+.level-aa {
+    --level-color: var(--level-aa);
+    --level-bg: var(--level-aa-bg);
+}
+
+.level-a-plus {
+    --level-color: var(--level-a-plus);
+    --level-bg: var(--level-a-plus-bg);
+}
+
+.level-a {
+    --level-color: var(--level-a);
+    --level-bg: var(--level-a-bg);
+}
+
+.level-winter {
+    --level-color: var(--level-winter);
+    --level-bg: var(--level-winter-bg);
 }
 
 
@@ -639,7 +705,8 @@ textarea {
 
 .tooltip {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     cursor: help;
 }
 
@@ -657,7 +724,7 @@ textarea {
     margin-top: 0.25em;
     min-width: 80px;
     right: -50%;
-    top: -35px;
+    top: 1rem;
 }
 
 /* tooltip positioning */

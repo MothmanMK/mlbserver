@@ -2572,10 +2572,11 @@ document.addEventListener("DOMContentLoaded", function () {
           let color1 = hexToRgba(TEAM_COLORS[fav_team][1], 0.2)
           let color2 = hexToRgba(TEAM_COLORS[fav_team][0], 0)
           
-          fav_style = ' style="background-image: linear-gradient(' + '0deg, ' + color1 + ', ' + color2 + '); border: 1px solid #' + TEAM_COLORS[fav_team][1] + '; border-style: outset; border-radius: 3px;"'
+          fav_style = ' style="background-image: linear-gradient(' + '0deg, ' + color1 + ', ' + color2 + '); border: 1px solid #' + TEAM_COLORS[fav_team][1] + '!important;; border-style: outset; border-radius: 3px;"'
         }
 
         let gameLevel = session.getLevelNameFromSportId(cache_data.dates[0].games[j].teams['home'].team.sport.id);
+        let gameLevelClass = 'level-' + gameLevel.toLowerCase().replace('+', '-plus')
 
         if ( cache_data.dates[0].games[j].seriesDescription != 'Regular Season' ) {
           gameLevel = cache_data.dates[0].games[j].seriesDescription
@@ -2939,14 +2940,14 @@ document.addEventListener("DOMContentLoaded", function () {
               let pitcherVis = 'is-invisible'
               if (awayPitcher || homePitcher) { pitcherVis ='' }
             body +=`
-          <div class="cardContainer" ${fav_style}>
+          <div class="cardContainer ${gameLevelClass}" ${fav_style}>
 
             <div class="cardHeader flex-between">
               <div class="flex-between">
-                  <div class="tag level">${gameLevel}</div>
+                  <div class="tag level ${gameLevelClass}">${gameLevel}</div>
 
               </div>
-              <div class="flex-between">
+              <div class="cardTags">
                   <span class="tooltip ${scheduleVis}">
                     <span class="tag schedule">SCD
                       <span class="tooltiptext"> ${scheduleDesc}<br>${resumeText}</span>
