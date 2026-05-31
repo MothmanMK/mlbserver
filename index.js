@@ -1735,29 +1735,60 @@ app.get('/', async function(req, res) {
       body += '<p><a href="' + http_root + '/logout">Logout</a></p>' + "\n"
     }
     body +=`<div class="section">`
-    body += '<div class="menuContainer">'
-    body += '<div class="cardMenuHeader">Controls</div>'
-    body += '<div class="menuContent">'
-    body += '<span class="tinytext">Touch or hover over an option name for more details</span>' + "\n"
+    body += '<div class="menuContainer settingsContainer">'
+    body += '<div class="cardMenuHeader">Stream Settings</div>'
+    body += '<div class="menuContent settingsContent">'
 
     todayUTCHours -= 4
-    body += '<p><span class="tooltip">Date<span class="tooltiptext">"today" lasts until ' + todayUTCHours + ' AM EST. Home page will default to yesterday between ' + todayUTCHours + ' AM - ' + (YESTERDAY_UTC_HOURS - 4) + ' AM EST.</span></span>: <input type="date" id="gameDate" value="' + gameDate + '"/> '
+    const settingsInfoText = {
+      dateInfo: '"today" lasts until ' + todayUTCHours + ' AM EST. Home page will default to yesterday between ' + todayUTCHours + ' AM - ' + (YESTERDAY_UTC_HOURS - 4) + ' AM EST.',
+      levelInfo: 'Major or minor league level.',
+      orgInfo: 'Major league parent organization.',
+      mediaTypeInfo: 'Video is TV broadcasts, Audio is English radio, and Spanish is Spanish radio (not available for all games).',
+      linkTypeInfo: 'Embed will play in your browser (with AirPlay support), Stream will give you a stream URL to open directly in media players like Kodi or VLC, Chromecast is a desktop browser-based casting site, Advanced will play in your desktop browser with some extra tools and debugging information (Advanced may require you to disable insecure / mixed content blocking in your browser), and Download will prompt your browser to save the stream to a TS (Transport Stream) file.<br><br>NOTE: Chromecast may not be able to resolve local domain names; if so, you can simply access this page (and thus the streams) using an IP address instead.',
+      videoControlsInfo: 'Choose whether to show or hide controls on the embedded video page. Helpful to avoid timeline spoilers.',
+      startFromInfo: 'For the embedded player only: Beginning will start playback at the beginning of the stream (may be 1 hour before game time for live games), and Live will start at the live point (if the event is live -- archive games should always start at the beginning). You can still seek anywhere.',
+      inningInfo: 'For video streams only: choose the inning to start with (and the score to display, if applicable). Inning number is relative -- for example, selecting inning 7 here will show inning 7 for scheduled 9-inning games, but inning 5 for scheduled 7-inning games, for example. If an inning number is specified, seeking to an earlier point will not be possible. Default is the beginning of the stream. To use with radio, set the video track to "None".',
+      scoresInfo: 'Choose whether to show scores on this web page. Combine this with the inning option to only show scores through the specified inning.',
+      videoInfo: 'For video streams only: you can manually specifiy a video track (resolution) to use. Adaptive will let your client choose. Best will select either 1080p60 (MLB) or 720p60 (MiLB). 504p is default for multiview (see below).<br/><br/>None will allow to remove the video tracks, if you just want to listen to the audio while using the "start at inning" or "skip breaks" options enabled.',
+      audioInfo: 'For video streams only: you can manually specifiy which audio track to include. Some media players can accept them all and let you choose. Not all tracks are available for all games, and injected tracks may not work with skip options below.<br/><br/>If you select "none" for video above, picking an audio track here will make it an audio-only feed that supports the inning start and skip breaks options.',
+      captionsInfo: 'For video streams only: you can disable the caption track, if one is present. This is handy if you do not want to disable it in your player each time.',
+      skipInfo: 'For video streams only (use the video "none" option above to apply it to audio streams): you can remove all breaks, idle time, non-action pitches, or only commercial breaks from the stream (useful to make your own "condensed games").<br/><br/>NOTES: skip timings are only generated when the stream is loaded -- so for live games, it will only skip up to the time you loaded the stream. Also, commercial skip will not work on pre-2024 games, or on MiLB games -- use skip breaks instead.',
+      skipAdjustInfo: 'Seconds to adjust the skip time video segments, if necessary. Try a negative number if the plays are ending before the video segments begin; use a positive number if the video segments are ending before the play happens.',
+      padInfo: 'You can pad archive streams with random extra time at the end, to help conceal timeline spoilers.',
+      forceVodInfo: 'For streams only: if your client does not support seeking in mlbserver live streams, turning this on will make the stream look like a VOD stream instead, allowing the client to start at the beginning and allowing the user to seek within it. You will need to reload the stream to watch/view past the current time, though.'
+    }
+
+    function settingInfoLabel(label, id) {
+      return '<div class="settingLabel is-flex"><span>' + label + '</span><span class="info infoPadding" data-target="#' + id + '">?</span></div>'
+    }
+
+    function settingInlineInfoLabel(label, id) {
+      return '<span class="settingInlineLabel is-flex"><span>' + label + '</span><span class="info infoPadding" data-target="#' + id + '">?</span></span>'
+    }
+
+    function settingInfo(id) {
+      return '<div id="' + id + '" class="infoContainer"><div class="infoContent">' + settingsInfoText[id] + '</div></div>'
+    }
+
+    body += '<div class="settingsGroup"><div class="settingsGroupHeader">Date & Scope</div>'
+    body += '<div class="settingRow">' + settingInfoLabel('Date', 'dateInfo') + '<div class="settingControl"><input type="date" id="gameDate" value="' + gameDate + '"/> '
     for (var i = 0; i < VALID_DATES.length; i++) {
       body += '<button '
       if ( ((VALID_DATES[i] == VALID_DATES[0]) && (gameDate == today)) || ((VALID_DATES[i] == VALID_DATES[1]) && (gameDate == yesterday)) ) body += 'class="default" '
       body += 'onclick="date=\'' + VALID_DATES[i] + '\';reload()">' + VALID_DATES[i] + '</button> '
     }
-    body += '</p>' + "\n" + '<p><span>Updated ' + session.getCacheUpdatedDate(cache_name) + '</span></p>' + "\n"
+    body += '</div></div>' + "\n" + settingInfo('dateInfo') + '<div class="settingsMeta"><span>Updated ' + session.getCacheUpdatedDate(cache_name) + '</span></div>' + "\n"
 
-    body += '<div class="option"><span class="tooltip">Level<span class="tooltiptext">Major or minor league level</span></span>: '
+    body += '<div class="settingRow">' + settingInfoLabel('Level', 'levelInfo') + '<div class="settingControl">'
     for (const [key, value] of Object.entries(levels)) {
       body += '<button '
       if ( level == key ) body += 'class="default" '
       body += 'onclick="org=\'' + default_org + '\';level=\'' + key + '\';reload()">' + key + '</button> '
     }
 
-    body += ' or</div>'
-    body += '<div class="option"><span class="tooltip">Org<span class="tooltiptext">Major league parent organization</span></span>: '
+    body += '<span class="settingsDivider">or</span>'
+    body += settingInlineInfoLabel('Org', 'orgInfo') + ' '
     body += '<select id="org" onchange="level=\'' + default_org + '\';org=this.value;reload()">'
     body += '<option value="' + default_org + '">' + default_org + '</option>'
     var orgs = session.getOrgs()
@@ -1766,35 +1797,35 @@ app.get('/', async function(req, res) {
       if ( org == orgs[i] ) body += ' selected'
       body += '>' + orgs[i] + '</option> '
     }
-    body += '</select></div>' + "\n"
+    body += '</select></div></div>' + settingInfo('levelInfo') + settingInfo('orgInfo') + '</div>' + "\n"
 
-    body += '<p><span class="tooltip">Media Type<span class="tooltiptext">Video is TV broadcasts, Audio is English radio, and Spanish is Spanish radio (not available for all games).</span></span>: '
+    body += '<div class="settingsGroup"><div class="settingsGroupHeader">Stream Output</div>'
+    body += '<div class="settingRow">' + settingInfoLabel('Media Type', 'mediaTypeInfo') + '<div class="settingControl">'
     for (var i = 0; i < VALID_MEDIA_TYPES.length; i++) {
       body += '<button '
       if ( mediaType == VALID_MEDIA_TYPES[i] ) body += 'class="default" '
       body += 'onclick="mediaType=\'' + VALID_MEDIA_TYPES[i] + '\';reload()">' + VALID_MEDIA_TYPES[i] + '</button> '
     }
-    body += '</p>' + "\n"
+    body += '</div></div>' + "\n" + settingInfo('mediaTypeInfo')
 
-    body += '<p><span class="tooltip">Link Type<span class="tooltiptext">Embed will play in your browser (with AirPlay support), Stream will give you a stream URL to open directly in media players like Kodi or VLC, Chromecast is a desktop browser-based casting site, Advanced will play in your desktop browser with some extra tools and debugging information (Advanced may require you to disable insecure / mixed content blocking in your browser), and Download will prompt your browser to save the stream to a TS (Transport Stream) file.<br><br>NOTE: Chromecast may not be able to resolve local domain names; if so, you can simply access this page (and thus the streams) using an IP address instead.</span></span>: '
+    body += '<div class="settingRow">' + settingInfoLabel('Link Type', 'linkTypeInfo') + '<div class="settingControl">'
     for (var i = 0; i < VALID_LINK_TYPES.length; i++) {
       body += '<button '
       if ( linkType == VALID_LINK_TYPES[i] ) body += 'class="default" '
       body += 'onclick="linkType=\'' + VALID_LINK_TYPES[i] + '\';reload()">' + VALID_LINK_TYPES[i] + '</button> '
     }
-    body += '</p>' + "\n"
+    body += '</div></div>' + "\n" + settingInfo('linkTypeInfo')
 
-    body += '<p>'
     if ( linkType == VALID_LINK_TYPES[0] ) {
-      body += '<span class="tooltip">Video Controls<span class="tooltiptext">Choose whether to show or hide controls on the embedded video page. Helpful to avoid timeline spoilers.</span></span>: '
+      body += '<div class="settingRow">' + settingInfoLabel('Video Controls', 'videoControlsInfo') + '<div class="settingControl">'
       for (var i = 0; i < VALID_CONTROLS.length; i++) {
         body += '<button '
         if ( controls == VALID_CONTROLS[i] ) body += 'class="default" '
         body += 'onclick="controls=\'' + VALID_CONTROLS[i] + '\';reload()">' + VALID_CONTROLS[i] + '</button> '
       }
-      body += '</p>' + "\n"
+      body += '</div></div>' + "\n" + settingInfo('videoControlsInfo')
 
-      body += '<div class="option"><span class="tooltip">Start From<span class="tooltiptext">For the embedded player only: Beginning will start playback at the beginning of the stream (may be 1 hour before game time for live games), and Live will start at the live point (if the event is live -- archive games should always start at the beginning). You can still seek anywhere.</span></span>: '
+      body += '<div class="settingRow">' + settingInfoLabel('Start From', 'startFromInfo') + '<div class="settingControl">'
       for (var i = 0; i < VALID_START_FROM.length; i++) {
         body += '<button '
         if ( startFrom == VALID_START_FROM[i] ) body += 'class="default" '
@@ -1802,12 +1833,18 @@ app.get('/', async function(req, res) {
       }
       body += "\n"
       if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-        body += 'or</div> '
+        body += '<span class="settingsDivider">or</span>'
+      } else {
+        body += '</div></div>' + settingInfo('startFromInfo')
       }
     }
 
     if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-      body += '<div class="option"><span class="tooltip">Inning<span class="tooltiptext">For video streams only: choose the inning to start with (and the score to display, if applicable). Inning number is relative -- for example, selecting inning 7 here will show inning 7 for scheduled 9-inning games, but inning 5 for scheduled 7-inning games, for example. If an inning number is specified, seeking to an earlier point will not be possible. Default is the beginning of the stream. To use with radio, set the video track to "None".</span></span>: '
+      if ( linkType != VALID_LINK_TYPES[0] ) {
+        body += '<div class="settingRow">' + settingInfoLabel('Inning', 'inningInfo') + '<div class="settingControl">'
+      } else {
+        body += settingInlineInfoLabel('Inning', 'inningInfo') + ' '
+      }
       body += '<select id="inning_half" onchange="inning_half=this.value;reload()">'
       for (var i = 0; i < VALID_INNING_HALF.length; i++) {
         body += '<option value="' + VALID_INNING_HALF[i] + '"'
@@ -1825,23 +1862,23 @@ app.get('/', async function(req, res) {
       }
       body += '</select>'
     }
-    body += '</div>' + "\n"
+    if ( mediaType == VALID_MEDIA_TYPES[0] ) {
+      body += '</div></div>' + "\n"
+      if ( linkType == VALID_LINK_TYPES[0] ) body += settingInfo('startFromInfo')
+      body += settingInfo('inningInfo')
+    }
 
-    body += '<p><span class="tooltip">Scores<span class="tooltiptext">Choose whether to show scores on this web page. Combine this with the inning option to only show scores through the specified inning.</span></span>: '
+    body += '<div class="settingRow">' + settingInfoLabel('Scores', 'scoresInfo') + '<div class="settingControl">'
     for (var i = 0; i < VALID_SCORES.length; i++) {
       body += '<button '
       if ( scores == VALID_SCORES[i] ) body += 'class="default" '
       body += 'onclick="scores=\'' + VALID_SCORES[i] + '\';reload()">' + VALID_SCORES[i] + '</button> '
     }
-    body += '</p>' + "\n"
-
-    body += '</div></div></div>'
-
-
-       body += '<div class="section"><div class="menuContainer"><div class="cardMenuHeader">Video Options</div><div class="menuContent">'
+    body += '</div></div>' + settingInfo('scoresInfo') + '</div>' + "\n"
 
     if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-        body += '<span class="tooltip">Video<span class="tooltiptext">For video streams only: you can manually specifiy a video track (resolution) to use. Adaptive will let your client choose. Best will select either 1080p60 (MLB) or 720p60 (MiLB). 504p is default for multiview (see below).<br/><br/>None will allow to remove the video tracks, if you just want to listen to the audio while using the "start at inning" or "skip breaks" options enabled.</span></span>: '
+        body += '<div class="settingsGroup"><div class="settingsGroupHeader">Video & Audio</div>'
+        body += '<div class="settingRow">' + settingInfoLabel('Video', 'videoInfo') + '<div class="settingControl">'
         body += '<button '
         if ( resolution == 'best' ) body += 'class="default" '
         body += 'onclick="resolution=\'best\';reload()">best</button> '
@@ -1854,55 +1891,60 @@ app.get('/', async function(req, res) {
           }
           body += '</button> '
         }
+        body += '</div></div>' + settingInfo('videoInfo')
 
-        body += '<p><span class="tooltip">Audio<span class="tooltiptext">For video streams only: you can manually specifiy which audio track to include. Some media players can accept them all and let you choose. Not all tracks are available for all games, and injected tracks may not work with skip options below.<br/><br/>If you select "none" for video above, picking an audio track here will make it an audio-only feed that supports the inning start and skip breaks options.</span></span>: '
+        body += '<div class="settingRow">' + settingInfoLabel('Audio', 'audioInfo') + '<div class="settingControl">'
         for (var i = 0; i < VALID_AUDIO_TRACKS.length; i++) {
           body += '<button '
           if ( audio_track == VALID_AUDIO_TRACKS[i] ) body += 'class="default" '
           body += 'onclick="audio_track=\'' + VALID_AUDIO_TRACKS[i] + '\';reload()">' + DISPLAY_AUDIO_TRACKS[i] + '</button> '
         }
-        body += '</p>' + "\n"
+        body += '</div></div>' + "\n" + settingInfo('audioInfo')
 
-        body += '<p><span class="tooltip">Captions<span class="tooltiptext">For video streams only: you can disable the caption track, if one is present. This is handy if you do not want to disable it in your player each time.</span></span>: '
+        body += '<div class="settingRow">' + settingInfoLabel('Captions', 'captionsInfo') + '<div class="settingControl">'
         for (var i = 0; i < VALID_CAPTIONS.length; i++) {
           body += '<button '
           if ( captions == VALID_CAPTIONS[i] ) body += 'class="default" '
           body += 'onclick="captions=\'' + VALID_CAPTIONS[i] + '\';reload()">' + VALID_CAPTIONS[i] + '</button> '
         }
-        body += '</p>' + "\n"
+        body += '</div></div>' + settingInfo('captionsInfo') + '</div>' + "\n"
 
-        body += '<p><span class="tooltip">Skip<span class="tooltiptext">For video streams only (use the video "none" option above to apply it to audio streams): you can remove all breaks, idle time, non-action pitches, or only commercial breaks from the stream (useful to make your own "condensed games").<br/><br/>NOTES: skip timings are only generated when the stream is loaded -- so for live games, it will only skip up to the time you loaded the stream. Also, commercial skip will not work on pre-2024 games, or on MiLB games -- use skip breaks instead.</span></span>: '
+        body += '<div class="settingsGroup"><div class="settingsGroupHeader">Timeline</div>'
+        body += '<div class="settingRow">' + settingInfoLabel('Skip', 'skipInfo') + '<div class="settingControl">'
         for (var i = 0; i < VALID_SKIP.length; i++) {
           body += '<button '
           if ( skip == VALID_SKIP[i] ) body += 'class="default" '
           body += 'onclick="skip=\'' + VALID_SKIP[i] + '\';reload()">' + VALID_SKIP[i] + '</button> '
         }
         if ( skip != VALID_SKIP[0] ) {
-          body += '<br><span class="tooltip">Skip Adjust<span class="tooltiptext">Seconds to adjust the skip time video segments, if necessary. Try a negative number if the plays are ending before the video segments begin; use a positive number if the video segments are ending before the play happens.</span></span>: <input type="number" id="skip_adjust" value="' + skip_adjust + '" step="1" onchange="setTimeout(function(){skip_adjust=document.getElementById(\'skip_adjust\').value;reload()},750)" onblur="skip_adjust=this.value;reload()" style="vertical-align:top;font-size:.8em;width:3em"/>'
+          body += settingInlineInfoLabel('Skip Adjust', 'skipAdjustInfo') + ' <input type="number" id="skip_adjust" value="' + skip_adjust + '" step="1" onchange="setTimeout(function(){skip_adjust=document.getElementById(\'skip_adjust\').value;reload()},750)" onblur="skip_adjust=this.value;reload()" style="vertical-align:top;font-size:.8em;width:3em"/>'
         }
-        body += '</p>' + "\n"
+        body += '</div></div>' + "\n" + settingInfo('skipInfo')
+        if ( skip != VALID_SKIP[0] ) body += settingInfo('skipAdjustInfo')
       }
 
-      body += '<p><span class="tooltip">Pad<span class="tooltiptext">You can pad archive streams with random extra time at the end, to help conceal timeline spoilers.</span></span>: '
+      if ( mediaType != VALID_MEDIA_TYPES[0] ) {
+        body += '<div class="settingsGroup"><div class="settingsGroupHeader">Timeline</div>'
+      }
+      body += '<div class="settingRow">' + settingInfoLabel('Pad', 'padInfo') + '<div class="settingControl">'
       for (var i = 0; i < VALID_PAD.length; i++) {
         body += '<button '
         if ( pad == VALID_PAD[i] ) body += 'class="default" '
         body += 'onclick="pad=\'' + VALID_PAD[i] + '\';reload()">' + VALID_PAD[i] + '</button> '
       }
-      body += '</p>' + "\n"
+      body += '</div></div>' + "\n" + settingInfo('padInfo')
 
       if ( (linkType == VALID_LINK_TYPES[1]) && (gameDate == today) ) {
-        body += '<p><span class="tooltip">Force VOD<span class="tooltiptext">For streams only: if your client does not support seeking in mlbserver live streams, turning this on will make the stream look like a VOD stream instead, allowing the client to start at the beginning and allowing the user to seek within it. You will need to reload the stream to watch/view past the current time, though.</span></span>: '
+        body += '<div class="settingRow">' + settingInfoLabel('Force VOD', 'forceVodInfo') + '<div class="settingControl">'
         for (var i = 0; i < VALID_FORCE_VOD.length; i++) {
           body += '<button '
           if ( force_vod == VALID_FORCE_VOD[i] ) body += 'class="default" '
           body += 'onclick="force_vod=\'' + VALID_FORCE_VOD[i] + '\';reload()">' + VALID_FORCE_VOD[i] + '</button> '
         }
-        body += '<span>(if client does not support seeking in live streams)</span></p>' + "\n"
+        body += '<span>(if client does not support seeking in live streams)</span></div></div>' + "\n" + settingInfo('forceVodInfo')
       }
 
-      body += '</div></div>' 
-    body += '</div>' 
+    body += '</div></div></div></div>' 
 
  body += `
     <div class="section">

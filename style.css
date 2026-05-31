@@ -130,6 +130,67 @@ h1 {
     margin: 10px;
 }
 
+.settingsContainer {
+    max-width: 1180px;
+}
+
+.settingsContent {
+    display: grid;
+    gap: 14px;
+}
+
+.settingsGroup {
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    border: 1px solid #263340;
+    border-radius: 4px;
+    background: #171a20;
+}
+
+.settingsGroupHeader {
+    color: goldenrod;
+    font-size: 0.78rem;
+    font-weight: bold;
+}
+
+.settingRow {
+    display: grid;
+    grid-template-columns: minmax(130px, 180px) 1fr;
+    gap: 8px 14px;
+    align-items: center;
+}
+
+.settingLabel {
+    color: #d7d9dc;
+    font-size: 0.86rem;
+    font-weight: bold;
+}
+
+.settingControl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+
+.settingInlineLabel {
+    color: #d7d9dc;
+    font-size: 0.86rem;
+    font-weight: bold;
+}
+
+.settingsDivider {
+    color: #8f969f;
+    font-size: 0.78rem;
+    margin: 0 3px;
+}
+
+.settingsMeta {
+    color: #8f969f;
+    font-size: 0.78rem;
+}
+
 .infoContainer {
     font-size: small;
     max-height: 0;
@@ -217,6 +278,7 @@ h1 {
     border-radius: 1rem;
     color: goldenrod;
     cursor: pointer;
+    user-select: none;
 }
 
 .infoPadding {
@@ -411,6 +473,7 @@ button {
     color: black;
     background-color: lightgray;
     min-width: 3rem;
+    min-height: 1.5rem;
     border: none;
     padding: 1px 5px 1px 5px;
     text-align: center;
@@ -596,6 +659,10 @@ textarea {
 
     .menuContainer {
         width: 470px;
+    }
+
+    .settingRow {
+        grid-template-columns: 1fr;
     }
 
     .infoContent {
