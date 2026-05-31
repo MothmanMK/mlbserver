@@ -131,34 +131,33 @@ h1 {
 }
 
 .settingsContainer {
-    max-width: 1180px;
+    max-width: 980px;
 }
 
 .settingsContent {
     display: grid;
-    gap: 14px;
+    gap: 16px;
 }
 
 .settingsGroup {
     display: grid;
-    gap: 4px;
-    padding: 10px;
-    border: 1px solid #263340;
-    border-radius: 4px;
-    background: #171a20;
+    gap: 6px;
+    padding: 2px;
 }
 
 .settingsGroupHeader {
     color: goldenrod;
     font-size: 0.78rem;
     font-weight: bold;
+    padding-bottom: 3px;
 }
 
 .settingRow {
     display: grid;
-    grid-template-columns: minmax(130px, 180px) 1fr;
-    gap: 8px 14px;
+    grid-template-columns: minmax(120px, 160px) 1fr;
+    gap: 5px 12px;
     align-items: center;
+    padding: 0;
 }
 
 .settingLabel {
@@ -189,6 +188,51 @@ h1 {
 .settingsMeta {
     color: #8f969f;
     font-size: 0.78rem;
+}
+
+.settingsDisclosure {
+    margin-top: 4px;
+}
+
+.settingsDisclosure summary {
+    align-items: center;
+    background: rgba(218, 165, 32, 0.08);
+    border-radius: 4px;
+    color: goldenrod;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: bold;
+    gap: 7px;
+    list-style: none;
+    padding: 5px 8px;
+    user-select: none;
+}
+
+.settingsDisclosure summary::-webkit-details-marker {
+    display: none;
+}
+
+.settingsDisclosure summary::after {
+    color: #8f969f;
+    content: "+";
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.settingsDisclosure[open] summary::after {
+    content: "-";
+}
+
+.settingsDisclosure summary:hover {
+    background: rgba(218, 165, 32, 0.14);
+    color: #e4bd55;
+}
+
+.settingsDisclosureContent {
+    display: grid;
+    gap: 5px;
+    padding-top: 6px;
 }
 
 .infoContainer {

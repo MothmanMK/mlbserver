@@ -1737,7 +1737,7 @@ app.get('/', async function(req, res) {
     }
     body +=`<div class="section">`
     body += '<div class="menuContainer settingsContainer">'
-    body += '<div class="cardMenuHeader">Stream Settings</div>'
+    body += '<div class="cardMenuHeader">Options</div>'
     body += '<div class="menuContent settingsContent">'
 
     todayUTCHours -= 4
@@ -1772,7 +1772,7 @@ app.get('/', async function(req, res) {
       return '<div id="' + id + '" class="infoContainer"><div class="infoContent">' + settingsInfoText[id] + '</div></div>'
     }
 
-    body += '<div class="settingsGroup"><div class="settingsGroupHeader">Date & Scope</div>'
+    body += '<div class="settingsGroup">'
     body += '<div class="settingRow">' + settingInfoLabel('Date', 'dateInfo') + '<div class="settingControl"><input type="date" id="gameDate" value="' + gameDate + '"/> '
     for (var i = 0; i < VALID_DATES.length; i++) {
       body += '<button '
@@ -1781,6 +1781,23 @@ app.get('/', async function(req, res) {
     }
     body += '</div></div>' + "\n" + settingInfo('dateInfo') + '<div class="settingsMeta"><span>Updated ' + session.getCacheUpdatedDate(cache_name) + '</span></div>' + "\n"
 
+    body += '<div class="settingRow">' + settingInfoLabel('Score', 'scoresInfo') + '<div class="settingControl">'
+    for (var i = 0; i < VALID_SCORES.length; i++) {
+      body += '<button '
+      if ( scores == VALID_SCORES[i] ) body += 'class="default" '
+      body += 'onclick="scores=\'' + VALID_SCORES[i] + '\';reload()">' + VALID_SCORES[i] + '</button> '
+    }
+    body += '</div></div>' + settingInfo('scoresInfo')
+
+    body += '<div class="settingRow">' + settingInfoLabel('Media Type', 'mediaTypeInfo') + '<div class="settingControl">'
+    for (var i = 0; i < VALID_MEDIA_TYPES.length; i++) {
+      body += '<button '
+      if ( mediaType == VALID_MEDIA_TYPES[i] ) body += 'class="default" '
+      body += 'onclick="mediaType=\'' + VALID_MEDIA_TYPES[i] + '\';reload()">' + VALID_MEDIA_TYPES[i] + '</button> '
+    }
+    body += '</div></div>' + "\n" + settingInfo('mediaTypeInfo')
+
+    body += '<details class="settingsDisclosure"><summary>Show more filters</summary><div class="settingsDisclosureContent">'
     body += '<div class="settingRow">' + settingInfoLabel('Level', 'levelInfo') + '<div class="settingControl">'
     for (const [key, value] of Object.entries(levels)) {
       body += '<button '
@@ -1798,54 +1815,22 @@ app.get('/', async function(req, res) {
       if ( org == orgs[i] ) body += ' selected'
       body += '>' + orgs[i] + '</option> '
     }
-    body += '</select></div></div>' + settingInfo('levelInfo') + settingInfo('orgInfo') + '</div>' + "\n"
+    body += '</select></div></div>' + settingInfo('levelInfo') + settingInfo('orgInfo') + '</div></details></div>' + "\n"
 
-    body += '<div class="settingsGroup"><div class="settingsGroupHeader">Stream Output</div>'
-    body += '<div class="settingRow">' + settingInfoLabel('Media Type', 'mediaTypeInfo') + '<div class="settingControl">'
-    for (var i = 0; i < VALID_MEDIA_TYPES.length; i++) {
-      body += '<button '
-      if ( mediaType == VALID_MEDIA_TYPES[i] ) body += 'class="default" '
-      body += 'onclick="mediaType=\'' + VALID_MEDIA_TYPES[i] + '\';reload()">' + VALID_MEDIA_TYPES[i] + '</button> '
-    }
-    body += '</div></div>' + "\n" + settingInfo('mediaTypeInfo')
-
-    body += '<div class="settingRow">' + settingInfoLabel('Link Type', 'linkTypeInfo') + '<div class="settingControl">'
-    for (var i = 0; i < VALID_LINK_TYPES.length; i++) {
-      body += '<button '
-      if ( linkType == VALID_LINK_TYPES[i] ) body += 'class="default" '
-      body += 'onclick="linkType=\'' + VALID_LINK_TYPES[i] + '\';reload()">' + VALID_LINK_TYPES[i] + '</button> '
-    }
-    body += '</div></div>' + "\n" + settingInfo('linkTypeInfo')
+    body += '<div class="settingsGroup">'
 
     if ( linkType == VALID_LINK_TYPES[0] ) {
-      body += '<div class="settingRow">' + settingInfoLabel('Video Controls', 'videoControlsInfo') + '<div class="settingControl">'
-      for (var i = 0; i < VALID_CONTROLS.length; i++) {
-        body += '<button '
-        if ( controls == VALID_CONTROLS[i] ) body += 'class="default" '
-        body += 'onclick="controls=\'' + VALID_CONTROLS[i] + '\';reload()">' + VALID_CONTROLS[i] + '</button> '
-      }
-      body += '</div></div>' + "\n" + settingInfo('videoControlsInfo')
-
       body += '<div class="settingRow">' + settingInfoLabel('Start From', 'startFromInfo') + '<div class="settingControl">'
       for (var i = 0; i < VALID_START_FROM.length; i++) {
         body += '<button '
         if ( startFrom == VALID_START_FROM[i] ) body += 'class="default" '
         body += 'onclick="startFrom=\'' + VALID_START_FROM[i] + '\';reload()">' + VALID_START_FROM[i] + '</button> '
       }
-      body += "\n"
-      if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-        body += '<span class="settingsDivider">or</span>'
-      } else {
-        body += '</div></div>' + settingInfo('startFromInfo')
-      }
+      body += '</div></div>' + settingInfo('startFromInfo')
     }
 
     if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-      if ( linkType != VALID_LINK_TYPES[0] ) {
-        body += '<div class="settingRow">' + settingInfoLabel('Inning', 'inningInfo') + '<div class="settingControl">'
-      } else {
-        body += settingInlineInfoLabel('Inning', 'inningInfo') + ' '
-      }
+      body += '<div class="settingRow">' + settingInfoLabel('Inning', 'inningInfo') + '<div class="settingControl">'
       body += '<select id="inning_half" onchange="inning_half=this.value;reload()">'
       for (var i = 0; i < VALID_INNING_HALF.length; i++) {
         body += '<option value="' + VALID_INNING_HALF[i] + '"'
@@ -1865,20 +1850,30 @@ app.get('/', async function(req, res) {
     }
     if ( mediaType == VALID_MEDIA_TYPES[0] ) {
       body += '</div></div>' + "\n"
-      if ( linkType == VALID_LINK_TYPES[0] ) body += settingInfo('startFromInfo')
       body += settingInfo('inningInfo')
     }
 
-    body += '<div class="settingRow">' + settingInfoLabel('Scores', 'scoresInfo') + '<div class="settingControl">'
-    for (var i = 0; i < VALID_SCORES.length; i++) {
+    body += '<details class="settingsDisclosure"><summary>Show more stream options</summary><div class="settingsDisclosureContent">'
+
+    body += '<div class="settingRow">' + settingInfoLabel('Link Type', 'linkTypeInfo') + '<div class="settingControl">'
+    for (var i = 0; i < VALID_LINK_TYPES.length; i++) {
       body += '<button '
-      if ( scores == VALID_SCORES[i] ) body += 'class="default" '
-      body += 'onclick="scores=\'' + VALID_SCORES[i] + '\';reload()">' + VALID_SCORES[i] + '</button> '
+      if ( linkType == VALID_LINK_TYPES[i] ) body += 'class="default" '
+      body += 'onclick="linkType=\'' + VALID_LINK_TYPES[i] + '\';reload()">' + VALID_LINK_TYPES[i] + '</button> '
     }
-    body += '</div></div>' + settingInfo('scoresInfo') + '</div>' + "\n"
+    body += '</div></div>' + "\n" + settingInfo('linkTypeInfo')
+
+    if ( linkType == VALID_LINK_TYPES[0] ) {
+      body += '<div class="settingRow">' + settingInfoLabel('Video Controls', 'videoControlsInfo') + '<div class="settingControl">'
+      for (var i = 0; i < VALID_CONTROLS.length; i++) {
+        body += '<button '
+        if ( controls == VALID_CONTROLS[i] ) body += 'class="default" '
+        body += 'onclick="controls=\'' + VALID_CONTROLS[i] + '\';reload()">' + VALID_CONTROLS[i] + '</button> '
+      }
+      body += '</div></div>' + "\n" + settingInfo('videoControlsInfo')
+    }
 
     if ( mediaType == VALID_MEDIA_TYPES[0] ) {
-        body += '<div class="settingsGroup"><div class="settingsGroupHeader">Video & Audio</div>'
         body += '<div class="settingRow">' + settingInfoLabel('Video', 'videoInfo') + '<div class="settingControl">'
         body += '<button '
         if ( resolution == 'best' ) body += 'class="default" '
@@ -1908,9 +1903,8 @@ app.get('/', async function(req, res) {
           if ( captions == VALID_CAPTIONS[i] ) body += 'class="default" '
           body += 'onclick="captions=\'' + VALID_CAPTIONS[i] + '\';reload()">' + VALID_CAPTIONS[i] + '</button> '
         }
-        body += '</div></div>' + settingInfo('captionsInfo') + '</div>' + "\n"
+        body += '</div></div>' + settingInfo('captionsInfo')
 
-        body += '<div class="settingsGroup"><div class="settingsGroupHeader">Timeline</div>'
         body += '<div class="settingRow">' + settingInfoLabel('Skip', 'skipInfo') + '<div class="settingControl">'
         for (var i = 0; i < VALID_SKIP.length; i++) {
           body += '<button '
@@ -1924,9 +1918,6 @@ app.get('/', async function(req, res) {
         if ( skip != VALID_SKIP[0] ) body += settingInfo('skipAdjustInfo')
       }
 
-      if ( mediaType != VALID_MEDIA_TYPES[0] ) {
-        body += '<div class="settingsGroup"><div class="settingsGroupHeader">Timeline</div>'
-      }
       body += '<div class="settingRow">' + settingInfoLabel('Pad', 'padInfo') + '<div class="settingControl">'
       for (var i = 0; i < VALID_PAD.length; i++) {
         body += '<button '
@@ -1936,7 +1927,7 @@ app.get('/', async function(req, res) {
       body += '</div></div>' + "\n" + settingInfo('padInfo')
 
       if ( (linkType == VALID_LINK_TYPES[1]) && (gameDate == today) ) {
-        body += '<div class="settingRow">' + settingInfoLabel('Force VOD', 'forceVodInfo') + '<div class="settingControl">'
+        body += '<div class="settingRow">' + settingInfoLabel('VOD', 'forceVodInfo') + '<div class="settingControl">'
         for (var i = 0; i < VALID_FORCE_VOD.length; i++) {
           body += '<button '
           if ( force_vod == VALID_FORCE_VOD[i] ) body += 'class="default" '
@@ -1945,7 +1936,7 @@ app.get('/', async function(req, res) {
         body += '<span>(if client does not support seeking in live streams)</span></div></div>' + "\n" + settingInfo('forceVodInfo')
       }
 
-    body += '</div></div></div></div>' 
+    body += '</div></details></div></div></div></div>'
 
  body += `
     <div class="section">
