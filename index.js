@@ -2988,7 +2988,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             
               </div>
-              <div class="parentOrg ${parentAwayVis}">` + cache_data.dates[0].games[j].teams['away'].team.parentOrgName + `</div>
+              <div class="parentOrg ${parentAwayVis}">` + (cache_data.dates[0].games[j].teams['away'].team.parentOrgName || '') + `</div>
 
               <div class="row ${gameLevel}">
                 <div class="team">
@@ -3001,7 +3001,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   <span class="">${homescore}</span>
                 </div>
               </div>
-              <div class="parentOrg ${parentHomeVis}">` + cache_data.dates[0].games[j].teams['home'].team.parentOrgName + `</div>
+              <div class="parentOrg ${parentHomeVis}">` + (cache_data.dates[0].games[j].teams['home'].team.parentOrgName || '') + `</div>
      
             
 
