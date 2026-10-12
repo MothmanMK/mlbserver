@@ -2425,7 +2425,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var relative_inning = (inning_number - (9 - scheduledInnings))
         relative_inning = relative_inning < 0 ? 0 : relative_inning
         //if ( (scores == VALID_SCORES[1]) && (cache_data.dates[0].games[j].gameUtils.isLive || cache_data.dates[0].games[j].gameUtils.isFinal) && !cache_data.dates[0].games[j].gameUtils.isCancelled && !cache_data.dates[0].games[j].gameUtils.isPostponed ) {
-        if ( (scores == VALID_SCORES[1]) && (abstractGameState != 'Preview') && (detailedState != 'Postponed') ) {
+        if ( (scores == VALID_SCORES[1]) && (abstractGameState != 'Preview') && (detailedState != 'Postponed') && (detailedState != 'Cancelled') ) {
           awayscore = ''
           homescore = ''
           if ( (inning_number != VALID_INNING_NUMBER[0]) && cache_data.dates[0].games[j].linescore && cache_data.dates[0].games[j].linescore.innings ) {
@@ -2493,6 +2493,8 @@ document.addEventListener("DOMContentLoaded", function () {
            //} else if ( cache_data.dates[0].games[j].gameUtils.isDelayed ) {
         } else if ( detailedState.startsWith('Delayed') ) {
          state = detailedState
+        } else if ( detailedState == 'Cancelled' ) {
+          state = detailedState
         }
 
          var filename = gameDate + ' ' + filename_teams + ' '
